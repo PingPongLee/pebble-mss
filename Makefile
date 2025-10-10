@@ -12,9 +12,6 @@ build:
 config:
 	pebble emu-app-config --emulator $(PEBBLE_EMULATOR)
 
-travis_build:
-	yes | sdk/bin/pebble build
-
 install:
 	pebble install --emulator $(PEBBLE_EMULATOR)
 
