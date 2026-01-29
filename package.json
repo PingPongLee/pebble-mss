@@ -1,15 +1,15 @@
 {
-    "author": "fg",
+    "author": "djda9l",
     "dependencies": {},
     "keywords": [],
-    "name": "m7s_wf_16_1",
+    "name": "m7s_wf_20",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "M7S_16_1",
+        "displayName": "M7S_20",
         "enableMultiJS": true,
         "messageKeys": {
             "KEY_BTY_LAST_CHARGED": 13,
@@ -115,12 +115,13 @@
             "aplite",
             "basalt",
             "chalk",
-            "diorite"
+            "diorite",
+            "emery"
         ],
         "uuid": "03adc57a-569b-4669-9a80-b505eaea314d",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "16.1.0"
+    "version": "20.0.0"
 }
