@@ -68,12 +68,13 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/Soles-feet-30x35px.png",
+                    "file": "images/steps.png",
                     "name": "IMAGE_HEALTH_STEPS",
                     "targetPlatforms": [
                         "basalt",
                         "chalk",
-                        "diorite"
+                        "diorite",
+                        "emery"
                     ],
                     "type": "bitmap"
                 },
@@ -84,7 +85,8 @@
                     "targetPlatforms": [
                         "basalt",
                         "chalk",
-                        "diorite"
+                        "diorite",
+                        "emery"
                     ],
                     "type": "bitmap"
                 },

@@ -82,7 +82,6 @@
   graphics_draw_line(ctx, GPoint(  5, 214), GPoint(  7, 214));
   graphics_draw_line(ctx, GPoint(  4, 215), GPoint(  8, 215));
   graphics_draw_line(ctx, GPoint(  3, 216), GPoint(  9, 216));
-
   graphics_draw_line(ctx, GPoint(160, 213), GPoint(160, 223)); //sunset
   graphics_draw_line(ctx, GPoint(159, 222), GPoint(161, 222)); //sunset  
   graphics_draw_line(ctx, GPoint(158, 221), GPoint(162, 221)); //sunset  

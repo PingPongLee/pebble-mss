@@ -541,9 +541,9 @@ void DisplayData(void) {
 
 
 	if (degree_f)
-		snprintf(buffer_1, sizeof(buffer_1), "%d°F", (int)(weather_TEMP*1.8+32));
+		snprintf(buffer_1, sizeof(buffer_1), "%d°", (int)(weather_TEMP*1.8+32));
 	else
-		snprintf(buffer_1, sizeof(buffer_1), "%d°C", weather_TEMP);
+		snprintf(buffer_1, sizeof(buffer_1), "%d°", weather_TEMP);
 	text_layer_set_text(weather_layer_1_temp, buffer_1);
 
 #ifndef PBL_PLATFORM_APLITE
@@ -1198,8 +1198,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 	//save last battery percent for displaying in DisplayLastUpdated():
 	actual_battery_percent = charge_state.charge_percent;
 
-
-#ifdef PBL_PLATFORM_APLITE //only on SDK 2.x
+#if defined(PBL_PLATFORM_APLITE) //only on SDK 2.x
 	//GRect(41, 21, 38, 11): size of InverterLayer
 	layer_set_frame(inverter_layer_get_layer(s_battery_layer_fill), GRect(3, 21-obstruction_shift, (int)38*actual_battery_percent/100, 11));
 	layer_set_hidden(inverter_layer_get_layer(s_battery_layer_fill), false);
@@ -1221,69 +1220,81 @@ static void handle_battery(BatteryChargeState charge_state) {
 		}
 	}
 #else
-	layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(3+X_OFFSET, 21+Y_OFFSET-obstruction_shift, (int)38*actual_battery_percent/100, 11));
-	//layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(0, 0-obstruction_shift, 180, 180));
-	layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
+	#if defined(PBL_PLATFORM_EMERY)
+		layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(3+X_OFFSET, 30+Y_OFFSET-obstruction_shift, (int)54*actual_battery_percent/100, 16));
+		//layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(0, 0-obstruction_shift, 180, 180));
+		layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
 
-	uint8_t variable_color = 0;
-#ifdef PBL_PLATFORM_CHALK
-	if (actual_battery_percent > 30){
-		variable_color = 0b11000100; // 40-100 %          
-	} else if (actual_battery_percent > 20){
-		variable_color = 0b11110100; // 30 %          dark orange (GColorOrange)
-	} else {
-		variable_color = 0b11110000; //  0 % -  20 %  red (GColorRed)
-	}
-#else
-	if (actual_battery_percent > 20){
-		variable_color = 0b11000100; // 30-100 %          
-	} else if (actual_battery_percent > 10){
-		variable_color = 0b11110100; // 20 %          dark orange (GColorOrange)
-	} else {
-		variable_color = 0b11110000; //  0 % -  10 %  red (GColorRed)
-	}
-#endif
+		uint8_t variable_color = 0;
+	#else
+		layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(3+X_OFFSET, 21+Y_OFFSET-obstruction_shift, (int)38*actual_battery_percent/100, 11));
+		//layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(0, 0-obstruction_shift, 180, 180));
+		layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
+
+		uint8_t variable_color = 0;
+	#endif
 
 
-	if (ColorProfile == 0) {
-		textcolor_bat_uint8 = 0b11111111; //white
-		bkgrcolor_bat_uint8 = 0b11000000; //black
-	} else if (ColorProfile == 1) {
-		textcolor_bat_uint8 = 0b11000000; //black
-		bkgrcolor_bat_uint8 = 0b11111111; //white
-	} else {
-		textcolor_bat_uint8 = 0b11111111;
-		bkgrcolor_bat_uint8 = variable_color;
-	}
-	//On all Profiles, make battery white on red if <= 20%:
-	if (actual_battery_percent <= 20){
-		textcolor_bat_uint8 = 0b11111111;
-		bkgrcolor_bat_uint8 = variable_color;
-	}
+	#ifdef PBL_PLATFORM_CHALK
+		if (actual_battery_percent > 30){
+			variable_color = 0b11000100; // 40-100 %          
+		} else if (actual_battery_percent > 20){
+			variable_color = 0b11110100; // 30 %          dark orange (GColorOrange)
+		} else {
+			variable_color = 0b11110000; //  0 % -  20 %  red (GColorRed)
+		}
+	#else
+		if (actual_battery_percent > 20){
+			variable_color = 0b11000100; // 30-100 %
+			//variable_color = 0b11111111; // 30-100 %          
+		} else if (actual_battery_percent > 10){
+			variable_color = 0b11110100; // 20 %          dark orange (GColorOrange)
+		} else {
+			variable_color = 0b11110000; //  0 % -  10 %  red (GColorRed)
+		}
+	#endif
 
-#ifdef PBL_PLATFORM_DIORITE
-	//On all Profiles (except 0 and 1), make battery white on red if <= 20%:
-	if (actual_battery_percent <= 20){
+
 		if (ColorProfile == 0) {
-			textcolor_bat_uint8 = 0b11000000; //black
-			bkgrcolor_bat_uint8 = 0b11111111; //white
-		} else if (ColorProfile == 1) {
 			textcolor_bat_uint8 = 0b11111111; //white
 			bkgrcolor_bat_uint8 = 0b11000000; //black
-		} else {
+		} else if (ColorProfile == 1) {
 			textcolor_bat_uint8 = 0b11000000; //black
 			bkgrcolor_bat_uint8 = 0b11111111; //white
+		} else {
+			textcolor_bat_uint8 = 0b11111111;
+			bkgrcolor_bat_uint8 = variable_color;
 		}
-	}
-#endif
+		//On all Profiles, make battery white on red if <= 20%:
+		if (actual_battery_percent <= 20){
+			textcolor_bat_uint8 = 0b11111111;
+			bkgrcolor_bat_uint8 = variable_color;
+		}
+
+	#ifdef PBL_PLATFORM_DIORITE
+		//On all Profiles (except 0 and 1), make battery white on red if <= 20%:
+		if (actual_battery_percent <= 20){
+			if (ColorProfile == 0) {
+				textcolor_bat_uint8 = 0b11000000; //black
+				bkgrcolor_bat_uint8 = 0b11111111; //white
+			} else if (ColorProfile == 1) {
+				textcolor_bat_uint8 = 0b11111111; //white
+				bkgrcolor_bat_uint8 = 0b11000000; //black
+			} else {
+				textcolor_bat_uint8 = 0b11000000; //black
+				bkgrcolor_bat_uint8 = 0b11111111; //white
+			}
+		}
+	#endif
 
 
-
-	GlobalInverterColor = textcolor_bat_uint8 & 0b00111111;
-	GlobalBkgColor      = bkgrcolor_bat_uint8 & 0b00111111;
-	textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
-	bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
-#endif
+		GlobalInverterColor = textcolor_bat_uint8 & 0b00111111;
+		//GlobalInverterColor = textcolor_bat_uint8 & 0b00000000;
+		GlobalBkgColor      = bkgrcolor_bat_uint8 & 0b00111111;
+		textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
+		bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
+		//bkgrcolor_bat		= GColorFromHEX(0x00307d);
+	#endif
 	text_layer_set_text_color(battery_runtime_layer, textcolor_bat);
 	layer_mark_dirty(background_paint_layer);
 
@@ -1350,12 +1361,17 @@ static void layer_update_callback_hour_1(Layer *layer, GContext* ctx) {
 	graphics_context_set_fill_color(ctx, background_color_clock);
 	graphics_fill_rect(ctx, GRect(0, 0, 26, 41), 0, GCornerNone);
 	graphics_context_set_stroke_color(ctx, textcolor_clock);
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 55;
+	#else
+		int fontsize = 41;
+	#endif	
 	switch (digit_h_1){
 		case 1: 
-			seven_segment_paint_1(ctx, 41, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 41, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		default:
 			break;
@@ -1366,36 +1382,41 @@ static void layer_update_callback_hour_2(Layer *layer, GContext* ctx) {
 	graphics_context_set_fill_color(ctx, background_color_clock);
 	graphics_fill_rect(ctx, GRect(0, 0, 26, 41), 0, GCornerNone);
 	graphics_context_set_stroke_color(ctx, textcolor_clock);
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 55;
+	#else
+		int fontsize = 41;
+	#endif			
 	switch (digit_h_2){
 		case 1: 
-			seven_segment_paint_1(ctx, 41, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 41, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		case 3: 
-			seven_segment_paint_3(ctx, 41, GPoint(0,0));
+			seven_segment_paint_3(ctx, fontsize, GPoint(0,0));
 			break;
 		case 4: 
-			seven_segment_paint_4(ctx, 41, GPoint(0,0));
+			seven_segment_paint_4(ctx, fontsize, GPoint(0,0));
 			break;
 		case 5: 
-			seven_segment_paint_5(ctx, 41, GPoint(0,0));
+			seven_segment_paint_5(ctx, fontsize, GPoint(0,0));
 			break;
 		case 6: 
-			seven_segment_paint_6(ctx, 41, GPoint(0,0));
+			seven_segment_paint_6(ctx, fontsize, GPoint(0,0));
 			break;
 		case 7: 
-			seven_segment_paint_7(ctx, 41, GPoint(0,0));
+			seven_segment_paint_7(ctx, fontsize, GPoint(0,0));
 			break;
 		case 8: 
-			seven_segment_paint_8(ctx, 41, GPoint(0,0));
+			seven_segment_paint_8(ctx, fontsize, GPoint(0,0));
 			break;
 		case 9: 
-			seven_segment_paint_9(ctx, 41, GPoint(0,0));
+			seven_segment_paint_9(ctx, fontsize, GPoint(0,0));
 			break;
 		case 0: 
-			seven_segment_paint_0(ctx, 41, GPoint(0,0));
+			seven_segment_paint_0(ctx, fontsize, GPoint(0,0));
 			break;
 		default:
 			break;
@@ -1405,24 +1426,29 @@ static void layer_update_callback_minute_1(Layer *layer, GContext* ctx) {
 	graphics_context_set_fill_color(ctx, background_color_clock);
 	graphics_fill_rect(ctx, GRect(0, 0, 26, 41), 0, GCornerNone);
 	graphics_context_set_stroke_color(ctx, textcolor_clock);
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 55;
+	#else
+		int fontsize = 41;
+	#endif			
 	switch (digit_m_1){
 		case 1: 
-			seven_segment_paint_1(ctx, 41, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 41, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		case 3: 
-			seven_segment_paint_3(ctx, 41, GPoint(0,0));
+			seven_segment_paint_3(ctx, fontsize, GPoint(0,0));
 			break;
 		case 4: 
-			seven_segment_paint_4(ctx, 41, GPoint(0,0));
+			seven_segment_paint_4(ctx, fontsize, GPoint(0,0));
 			break;
 		case 5: 
-			seven_segment_paint_5(ctx, 41, GPoint(0,0));
+			seven_segment_paint_5(ctx, fontsize, GPoint(0,0));
 			break;
 		case 0: 
-			seven_segment_paint_0(ctx, 41, GPoint(0,0));
+			seven_segment_paint_0(ctx, fontsize, GPoint(0,0));
 			break;
 		default:
 			break;
@@ -1432,36 +1458,41 @@ static void layer_update_callback_minute_2(Layer *layer, GContext* ctx) {
 	graphics_context_set_fill_color(ctx, background_color_clock);
 	graphics_fill_rect(ctx, GRect(0, 0, 26, 41), 0, GCornerNone);
 	graphics_context_set_stroke_color(ctx, textcolor_clock);
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 55;
+	#else
+		int fontsize = 41;
+	#endif		
 	switch (digit_m_2){
 		case 1: 
-			seven_segment_paint_1(ctx, 41, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 41, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		case 3: 
-			seven_segment_paint_3(ctx, 41, GPoint(0,0));
+			seven_segment_paint_3(ctx, fontsize, GPoint(0,0));
 			break;
 		case 4: 
-			seven_segment_paint_4(ctx, 41, GPoint(0,0));
+			seven_segment_paint_4(ctx, fontsize, GPoint(0,0));
 			break;
 		case 5: 
-			seven_segment_paint_5(ctx, 41, GPoint(0,0));
+			seven_segment_paint_5(ctx, fontsize, GPoint(0,0));
 			break;
 		case 6: 
-			seven_segment_paint_6(ctx, 41, GPoint(0,0));
+			seven_segment_paint_6(ctx, fontsize, GPoint(0,0));
 			break;
 		case 7: 
-			seven_segment_paint_7(ctx, 41, GPoint(0,0));
+			seven_segment_paint_7(ctx, fontsize, GPoint(0,0));
 			break;
 		case 8: 
-			seven_segment_paint_8(ctx, 41, GPoint(0,0));
+			seven_segment_paint_8(ctx, fontsize, GPoint(0,0));
 			break;
 		case 9: 
-			seven_segment_paint_9(ctx, 41, GPoint(0,0));
+			seven_segment_paint_9(ctx, fontsize, GPoint(0,0));
 			break;
 		case 0: 
-			seven_segment_paint_0(ctx, 41, GPoint(0,0));
+			seven_segment_paint_0(ctx, fontsize, GPoint(0,0));
 			break;
 		default:
 			break;
@@ -1476,30 +1507,39 @@ static void layer_update_callback_second_1(Layer *layer, GContext* ctx) {
 	if (!DisplaySeconds){
 		return;
 	}
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 20;
+	#else
+		int fontsize = 15;
+	#endif	
 	//APP_LOG(APP_LOG_LEVEL_INFO, "Seconds_1_Update");
 	if (DisplaySeconds >= 2) if (!SecOnShakingOn){
-		seven_segment_15_paint_segment_4(ctx, GPoint(0,0));
+		#if defined(PBL_PLATFORM_EMERY)
+			seven_segment_20_paint_segment_4(ctx, GPoint(0,0));
+		#else
+			seven_segment_15_paint_segment_4(ctx, GPoint(0,0));
+		#endif		
 		return;
 	}
 	switch (digit_s_1){
 		case 1: 
-			seven_segment_paint_1(ctx, 15, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 15, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		case 3: 
-			seven_segment_paint_3(ctx, 15, GPoint(0,0));
+			seven_segment_paint_3(ctx, fontsize, GPoint(0,0));
 			break;
 		case 4: 
-			seven_segment_paint_4(ctx, 15, GPoint(0,0));
+			seven_segment_paint_4(ctx, fontsize, GPoint(0,0));
 			break;
 		case 5: 
-			seven_segment_paint_5(ctx, 15, GPoint(0,0));
+			seven_segment_paint_5(ctx, fontsize, GPoint(0,0));
 			break;
 		case 0: 
-			seven_segment_paint_0(ctx, 15, GPoint(0,0));
-			break;
+			seven_segment_paint_0(ctx, fontsize, GPoint(0,0));
+			break;			
 		default:
 			break;
 	}
@@ -1511,41 +1551,50 @@ static void layer_update_callback_second_2(Layer *layer, GContext* ctx) {
 	if (!DisplaySeconds){
 		return;
 	}
+	#if defined(PBL_PLATFORM_EMERY)
+		int fontsize = 20;
+	#else
+		int fontsize = 15;
+	#endif
 	//APP_LOG(APP_LOG_LEVEL_INFO, "Seconds_2_Update");
 	if (DisplaySeconds >= 2) if (!SecOnShakingOn){
-		seven_segment_15_paint_segment_4(ctx, GPoint(0,0));
+		#if defined(PBL_PLATFORM_EMERY)
+			seven_segment_20_paint_segment_4(ctx, GPoint(0,0));
+		#else
+			seven_segment_15_paint_segment_4(ctx, GPoint(0,0));
+		#endif			
 		return;
 	}
 	switch (digit_s_2){
 		case 1: 
-			seven_segment_paint_1(ctx, 15, GPoint(0,0));
+			seven_segment_paint_1(ctx, fontsize, GPoint(0,0));
 			break;
 		case 2: 
-			seven_segment_paint_2(ctx, 15, GPoint(0,0));
+			seven_segment_paint_2(ctx, fontsize, GPoint(0,0));
 			break;
 		case 3: 
-			seven_segment_paint_3(ctx, 15, GPoint(0,0));
+			seven_segment_paint_3(ctx, fontsize, GPoint(0,0));
 			break;
 		case 4: 
-			seven_segment_paint_4(ctx, 15, GPoint(0,0));
+			seven_segment_paint_4(ctx, fontsize, GPoint(0,0));
 			break;
 		case 5: 
-			seven_segment_paint_5(ctx, 15, GPoint(0,0));
+			seven_segment_paint_5(ctx, fontsize, GPoint(0,0));
 			break;
 		case 6: 
-			seven_segment_paint_6(ctx, 15, GPoint(0,0));
+			seven_segment_paint_6(ctx, fontsize, GPoint(0,0));
 			break;
 		case 7: 
-			seven_segment_paint_7(ctx, 15, GPoint(0,0));
+			seven_segment_paint_7(ctx, fontsize, GPoint(0,0));
 			break;
 		case 8: 
-			seven_segment_paint_8(ctx, 15, GPoint(0,0));
+			seven_segment_paint_8(ctx, fontsize, GPoint(0,0));
 			break;
 		case 9: 
-			seven_segment_paint_9(ctx, 15, GPoint(0,0));
+			seven_segment_paint_9(ctx, fontsize, GPoint(0,0));
 			break;
 		case 0: 
-			seven_segment_paint_0(ctx, 15, GPoint(0,0));
+			seven_segment_paint_0(ctx, fontsize, GPoint(0,0));
 			break;
 		default:
 			break;
@@ -1555,10 +1604,12 @@ static void layer_update_callback_second_2(Layer *layer, GContext* ctx) {
 
 
 static void layer_update_callback_background(Layer *layer, GContext* ctx){
-#ifdef PBL_PLATFORM_CHALK
-#include "inc_background_layer_update_ptr.h"
+#if defined(PBL_PLATFORM_CHALK)
+	#include "inc_background_layer_update_ptr.h"
+#elif defined(PBL_PLATFORM_EMERY)
+	#include "inc_background_layer_update_emery.h"
 #else
-#include "inc_background_layer_update_p_ps_pt_pts.h"
+	#include "inc_background_layer_update_p_ps_pt_pts.h"
 #endif
 }
 
@@ -1611,7 +1662,7 @@ static void apply_color_profile(void){
 
 #ifndef PBL_PLATFORM_APLITE
 	text_layer_set_text_color(text_layer_health, textcolor_Steps);
-	bitmap_layer_set_background_color(s_health_bmp_layer, background_color_clock);
+	bitmap_layer_set_background_color(s_health_bmp_layer, GColorBlue);
 #endif
 
 #ifndef PBL_PLATFORM_APLITE
@@ -1726,7 +1777,7 @@ static void health_handler(HealthEventType event, void *context) {
 	if (HealthInfo == 3) do_update = 2; // allays steps
 	if (HealthInfo == 4) do_update = 3; // allays sleep
 
-	//do_update = 0;
+	do_update = 3;
 
 	health_higher_lower_than_avg = 0;
 
@@ -1808,21 +1859,30 @@ static void health_handler(HealthEventType event, void *context) {
 #endif
 
 static void layer_update_callback_health_up_down(Layer *layer, GContext* ctx){
+	health_higher_lower_than_avg = -1;
+	#if defined(PBL_PLATFORM_EMERY)
+		int multiplier = 18;
+		int pos = 19;
+	#else
+		int multiplier = 10;
+		int pos = 10;
+	#endif
+
 	graphics_context_set_fill_color(ctx, background_color_clock);
-	graphics_fill_rect(ctx, GRect(0, 0, 10, 10), 0, GCornerNone);
+	graphics_fill_rect(ctx, GRect(0, 0, pos, pos), 0, GCornerNone);
 	graphics_context_set_stroke_color(ctx, textcolor_Steps_actual);
 
 	if (health_higher_lower_than_avg > 0){
 		//TODO: paint arrow up
 		graphics_context_set_stroke_color(ctx, GColorGreen);
-		for (int i=0; i<10; i++){
-			graphics_draw_line(ctx, GPoint( 0+i/2, 10-i), GPoint(10-i/2,10-i));
+		for (int i=0; i<multiplier; i++){
+			graphics_draw_line(ctx, GPoint( 0+i/2, multiplier-i), GPoint(multiplier-i/2,multiplier-i));
 		}
 	} else if (health_higher_lower_than_avg < 0){
 		//TODO: paint arrow down
 		graphics_context_set_stroke_color(ctx, GColorRed);
-		for (int i=0; i<10; i++){
-			graphics_draw_line(ctx, GPoint( 0+i/2, i), GPoint(10-i/2,i));
+		for (int i=0; i<multiplier; i++){
+			graphics_draw_line(ctx, GPoint( 0+i/2, i), GPoint(multiplier-i/2,i));
 		}
 	}
 }
@@ -1845,12 +1905,14 @@ static void tap_handler(AccelAxisType axis, int32_t direction) {
 #endif
 
 
-
+// PBL_PLATFORM_EMERY
 // include it only after all globals are declared and funcs are declared
-#ifdef PBL_PLATFORM_CHALK
-#include "inc_main_load_ptr.h"
+#if defined(PBL_PLATFORM_CHALK)
+	#include "inc_main_load_ptr.h"
+#elif defined(PBL_PLATFORM_EMERY)
+	#include "inc_main_load_emery.h"
 #else
-#include "inc_main_load_p_ps_pt_pts.h"
+	#include "inc_main_load_p_ps_pt_pts.h"
 #endif
 
 

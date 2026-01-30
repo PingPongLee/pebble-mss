@@ -8,8 +8,8 @@ static void move_layers(void) {
 	MOVE_LAYER(s_image_layer_minute_1, 108, 128, 40, 56);
 	MOVE_LAYER(s_image_layer_minute_2, 162, 128, 40, 56);
 #ifdef COMPILE_WITH_SECONDS
-	MOVE_LAYER(s_image_layer_second_1, 113, 186, 10, 15);
-	MOVE_LAYER(s_image_layer_second_2, 126, 186, 10, 15);
+	MOVE_LAYER(s_image_layer_second_1, 168, 186, 30, 35);
+	MOVE_LAYER(s_image_layer_second_2, 184, 186, 30, 35);
 #endif
 	MOVE_TEXT_LAYER(text_sunrise_layer, 12, 206, 69, 38);
 	MOVE_TEXT_LAYER(text_sunset_layer, 167, 206, 69, 38);
@@ -26,7 +26,7 @@ static void move_layers(void) {
 	MOVE_LAYER(battery_layer, 3, 46, (int)53*battery.charge_percent/100, 15);
 
 	MOVE_TEXT_LAYER(Date_Layer, 5, 89, 186, 30);
-	MOVE_TEXT_LAYER(cwLayer, 72, 135, 64, 20);
+	MOVE_TEXT_LAYER(cwLayer, 125, 183, 38, 20);
 	MOVE_TEXT_LAYER(moonLayer_IMG, 71, NightMode ? 29 : 20, 46, 45);
 
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 69, 19, 130, 41);
@@ -36,9 +36,9 @@ static void move_layers(void) {
 	MOVE_TEXT_LAYER(weather_layer_7_string_2, 0, 69, 117, 23); //TODO
 	MOVE_TEXT_LAYER(text_TimeZone_layer, 5, 132, 100, 20); //TODO
 #ifndef PBL_PLATFORM_APLITE
-	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,137,15,14);
-	MOVE_TEXT_LAYER(text_layer_health, 14+10, 132, 100, 20); //TODO
-	MOVE_LAYER(s_layer_health_up_down, 14, 140, 10, 10);
+	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,185,23,23);
+	MOVE_LAYER(s_layer_health_up_down, 25, 187, 23, 23);
+	MOVE_TEXT_LAYER(text_layer_health, 25+23, 178, 90, 30); //TODO
 #endif
 }
 
@@ -64,6 +64,7 @@ static void create_layers(void) {
 #ifdef COMPILE_WITH_SECONDS
   s_image_layer_second_1 = layer_create(GRectZero);
   layer_set_update_proc(s_image_layer_second_1, layer_update_callback_second_1);
+
   layer_add_child(main_window_layer, s_image_layer_second_1);
   s_image_layer_second_2 = layer_create(GRectZero);
   layer_set_update_proc(s_image_layer_second_2, layer_update_callback_second_2);
@@ -131,7 +132,7 @@ static void create_layers(void) {
   cwLayer = text_layer_create(GRectZero); //64 = label_width = 144-72-2*4 = display_width - display_width/2 - 2*Space
   text_layer_set_text_color(cwLayer, textcolor);
   text_layer_set_background_color(cwLayer, GColorClear );
-  text_layer_set_font(cwLayer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(cwLayer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
   layer_add_child(main_window_layer, text_layer_get_layer(cwLayer));
   set_cwLayer_size();
@@ -211,7 +212,7 @@ static void create_layers(void) {
     text_layer_set_text_color(text_layer_health, textcolor);
     text_layer_set_text_alignment(text_layer_health, GTextAlignmentLeft);
     text_layer_set_text(text_layer_health, " ");
-    text_layer_set_font(text_layer_health, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+    text_layer_set_font(text_layer_health, fonts_get_system_font(FONT_KEY_GOTHIC_24));
   	layer_add_child(main_window_layer, text_layer_get_layer(text_layer_health));
 
     s_layer_health_up_down = layer_create(GRectZero);

@@ -15,21 +15,40 @@ void seven_segment_paint_8(GContext* ctx, int size, GPoint pos);
 void seven_segment_paint_9(GContext* ctx, int size, GPoint pos);
 void seven_segment_clear(GContext* ctx, int size, GPoint pos);
 
+#if defined(PBL_PLATFORM_EMERY)
+    void seven_segment_20_paint_segment_1(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_2(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_3(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_4(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_5(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_6(GContext* ctx, GPoint pos);
+    void seven_segment_20_paint_segment_7(GContext* ctx, GPoint pos);
+    void seven_segment_20_clear(GContext* ctx, GPoint pos);
 
-void seven_segment_15_paint_segment_1(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_2(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_3(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_4(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_5(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_6(GContext* ctx, GPoint pos);
-void seven_segment_15_paint_segment_7(GContext* ctx, GPoint pos);
-void seven_segment_15_clear(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_1(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_2(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_3(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_4(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_5(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_6(GContext* ctx, GPoint pos);
+    void seven_segment_55_paint_segment_7(GContext* ctx, GPoint pos);
+    void seven_segment_55_clear(GContext* ctx, GPoint pos);
+#else
+    void seven_segment_15_paint_segment_1(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_2(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_3(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_4(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_5(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_6(GContext* ctx, GPoint pos);
+    void seven_segment_15_paint_segment_7(GContext* ctx, GPoint pos);
+    void seven_segment_15_clear(GContext* ctx, GPoint pos);
 
-void seven_segment_41_paint_segment_1(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_2(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_3(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_4(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_5(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_6(GContext* ctx, GPoint pos);
-void seven_segment_41_paint_segment_7(GContext* ctx, GPoint pos);
-void seven_segment_41_clear(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_1(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_2(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_3(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_4(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_5(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_6(GContext* ctx, GPoint pos);
+    void seven_segment_41_paint_segment_7(GContext* ctx, GPoint pos);
+    void seven_segment_41_clear(GContext* ctx, GPoint pos);
+#endif
