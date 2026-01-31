@@ -992,7 +992,12 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 
 		if (!NightMode){
 			text_layer_set_font(moonLayer_IMG, pFontClimacons);
-			layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 15+Y_OFFSET-obstruction_shift, 33, 33));
+			#if defined(PBL_PLATFORM_EMERY)
+				layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(70+X_OFFSET, 24+Y_OFFSET-obstruction_shift, 45, 45));
+			#else
+				layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 15+Y_OFFSET-obstruction_shift, 33, 33));
+			#endif
+			
 
 			weather_icon[0] = (unsigned char)wi_day_and_night;
 			text_layer_set_text(moonLayer_IMG, weather_icon);
@@ -1001,8 +1006,11 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 	}
 #else
 	text_layer_set_font(moonLayer_IMG, pFontClimacons);
-	layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 15+Y_OFFSET-obstruction_shift, 33, 33));
-
+	#if defined(PBL_PLATFORM_EMERY)
+		layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(71+X_OFFSET, 28+Y_OFFSET-obstruction_shift, 45, 45));
+	#else
+		layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 15+Y_OFFSET-obstruction_shift, 33, 33));
+	#endif
 	static int wi_counter = 33;
 	wi_counter++; if (wi_counter>106) wi_counter = 33;
 	weather_icon[0] = (unsigned char)wi_counter;
@@ -1017,7 +1025,11 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 			moon[0] = (unsigned char)(moonphase_char_number(moonphase_number));
 
 			text_layer_set_font(moonLayer_IMG, pFontMoon);
-			layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 21+Y_OFFSET-obstruction_shift, 33, 33));
+			#if defined(PBL_PLATFORM_EMERY)
+				layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(71+X_OFFSET, 26+Y_OFFSET-obstruction_shift, 45, 45));
+			#else
+				layer_set_frame(text_layer_get_layer(moonLayer_IMG), GRect(51+X_OFFSET, 21+Y_OFFSET-obstruction_shift, 33, 33));
+			#endif			
 			text_layer_set_text(moonLayer_IMG, moon);
 			apply_color_profile();
 		}
@@ -1662,7 +1674,7 @@ static void apply_color_profile(void){
 
 #ifndef PBL_PLATFORM_APLITE
 	text_layer_set_text_color(text_layer_health, textcolor_Steps);
-	bitmap_layer_set_background_color(s_health_bmp_layer, GColorBlue);
+	bitmap_layer_set_background_color(s_health_bmp_layer, background_color_clock);
 #endif
 
 #ifndef PBL_PLATFORM_APLITE
@@ -1695,7 +1707,7 @@ static void apply_color_profile(void){
 
 
 static void set_cwLayer_size(void){
-#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT)
+#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_EMERY)
 #ifdef COMPILE_WITH_SECONDS
 	if (DisplaySeconds){
 		if ((TimeZoneFormat == 1) && (HealthInfo == 0)){
@@ -1777,7 +1789,7 @@ static void health_handler(HealthEventType event, void *context) {
 	if (HealthInfo == 3) do_update = 2; // allays steps
 	if (HealthInfo == 4) do_update = 3; // allays sleep
 
-	do_update = 3;
+	//do_update = 3;
 
 	health_higher_lower_than_avg = 0;
 
@@ -2187,8 +2199,13 @@ static void main_window_load(Window *window) {
 	initDone = false;
 
 	// --- Load Fonts --- 
-	pFontMoon = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_MOON_PHASES_SUBSET_24));
-	pFontClimacons = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CLIMACONS_32));
+	#if defined(PBL_PLATFORM_EMERY)
+		pFontMoon = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_MOON_PHASES_SUBSET_40));
+		pFontClimacons = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CLIMACONS_40));
+	#else
+		pFontMoon = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_MOON_PHASES_SUBSET_24));
+		pFontClimacons = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CLIMACONS_32));
+	#endif
 
 	//NightMode = 1;
 

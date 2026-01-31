@@ -68,12 +68,19 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/steps.png",
+                    "file": "images/Soles-feet-30x35px.png",
                     "name": "IMAGE_HEALTH_STEPS",
                     "targetPlatforms": [
                         "basalt",
                         "chalk",
-                        "diorite",
+                        "diorite"
+                    ],
+                    "type": "bitmap"
+                },                
+                {
+                    "file": "images/steps.png",
+                    "name": "IMAGE_HEALTH_STEPS",
+                    "targetPlatforms": [
                         "emery"
                     ],
                     "type": "bitmap"
@@ -85,11 +92,19 @@
                     "targetPlatforms": [
                         "basalt",
                         "chalk",
-                        "diorite",
-                        "emery"
+                        "diorite"
                     ],
                     "type": "bitmap"
                 },
+                {
+                    "file": "images/sleep.png",
+                    "memoryFormat": "1Bit",
+                    "name": "IMAGE_HEALTH_SLEEP",
+                    "targetPlatforms": [
+                        "emery"
+                    ],
+                    "type": "bitmap"
+                },                
                 {
                     "file": "fonts/moon_phases.ttf",
                     "name": "FONT_MOON_PHASES_SUBSET_30",
@@ -108,6 +123,16 @@
                 {
                     "file": "fonts/Climacons.ttf",
                     "name": "FONT_CLIMACONS_32",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Climacons.ttf",
+                    "name": "FONT_CLIMACONS_40",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/moon_phases.ttf",
+                    "name": "FONT_MOON_PHASES_SUBSET_40",
                     "type": "font"
                 }
             ]

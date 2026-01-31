@@ -3,10 +3,10 @@
 
 static void move_layers(void) {
 	MOVE_LAYER(background_paint_layer, 0, 0, 200, 228);
-	MOVE_LAYER(s_image_layer_hour_1, 4, 128, 40, 56);
-	MOVE_LAYER(s_image_layer_hour_2, 54, 128, 40, 56);
-	MOVE_LAYER(s_image_layer_minute_1, 108, 128, 40, 56);
-	MOVE_LAYER(s_image_layer_minute_2, 162, 128, 40, 56);
+	MOVE_LAYER(s_image_layer_hour_1, 4, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_hour_2, 51, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_minute_1, 113, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_minute_2, 162, 127, 40, 56);
 #ifdef COMPILE_WITH_SECONDS
 	MOVE_LAYER(s_image_layer_second_1, 168, 186, 30, 35);
 	MOVE_LAYER(s_image_layer_second_2, 184, 186, 30, 35);
@@ -26,15 +26,15 @@ static void move_layers(void) {
 	MOVE_LAYER(battery_layer, 3, 46, (int)53*battery.charge_percent/100, 15);
 
 	MOVE_TEXT_LAYER(Date_Layer, 5, 89, 186, 30);
-	MOVE_TEXT_LAYER(cwLayer, 125, 183, 38, 20);
-	MOVE_TEXT_LAYER(moonLayer_IMG, 71, NightMode ? 29 : 20, 46, 45);
+	MOVE_TEXT_LAYER(cwLayer, 125, 184, 73, 20);
+	MOVE_TEXT_LAYER(moonLayer_IMG, 71, NightMode ? 129 : 5, 46, 45);
 
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 69, 19, 130, 41);
 	MOVE_TEXT_LAYER(weather_layer_3_location, 0, -1, 152, 23);
 	MOVE_TEXT_LAYER(weather_layer_4_last_update, 153, -1, 47, 23);
-	MOVE_TEXT_LAYER(weather_layer_7_string_1, 131, 73-20, 200-119-2, 40);
+	MOVE_TEXT_LAYER(weather_layer_7_string_1, 120, 73-20, 200-119-2, 40);
 	MOVE_TEXT_LAYER(weather_layer_7_string_2, 0, 69, 117, 23); //TODO
-	MOVE_TEXT_LAYER(text_TimeZone_layer, 5, 132, 100, 20); //TODO
+	MOVE_TEXT_LAYER(text_TimeZone_layer, 5, 184, 100, 20); //TODO
 #ifndef PBL_PLATFORM_APLITE
 	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,185,23,23);
 	MOVE_LAYER(s_layer_health_up_down, 25, 187, 23, 23);
@@ -198,7 +198,7 @@ static void create_layers(void) {
   text_layer_set_text_color(text_TimeZone_layer, textcolor);
   text_layer_set_text_alignment(text_TimeZone_layer, GTextAlignmentLeft);
   text_layer_set_text(text_TimeZone_layer, " ");
-  text_layer_set_font(text_TimeZone_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
+  text_layer_set_font(text_TimeZone_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
 	layer_add_child(main_window_layer, text_layer_get_layer(text_TimeZone_layer));
 
   // Create Health_BMP Layer:

@@ -38,9 +38,10 @@
     graphics_fill_rect(ctx, GRect( 0, 69, 118, 24), 0, 0);
     graphics_fill_rect(ctx, GRect(119, 23, 81, 71), 0, 0);
     
+    // weather icon bg
     graphics_context_set_fill_color(ctx, background_color_moon);
     graphics_context_set_stroke_color(ctx, background_color_moon);
-    graphics_fill_rect(ctx, GRect(48, 17, 37, 33), 0, 0);
+    graphics_fill_rect(ctx, GRect(66, 23, 52, 45), 0, 0);
   
   
     if (warning_color_location == 1){
@@ -62,15 +63,15 @@
       graphics_context_set_fill_color(ctx, background_color_last_update);
       graphics_context_set_stroke_color(ctx, background_color_last_update);
     }
-    graphics_fill_rect(ctx, GRect(153, 0, 33, 22), 0, 0);
+    graphics_fill_rect(ctx, GRect(153, 0, 63, 22), 0, 0);
   
   #endif
   
   //draw dots of time:
   graphics_context_set_fill_color(ctx, textcolor_clock);
   graphics_context_set_stroke_color(ctx, textcolor_clock);
-  graphics_fill_rect(ctx, GRect(69, 102, 7, 7), 0, 0);
-  graphics_fill_rect(ctx, GRect(69, 124, 7, 7), 0, 0);
+  graphics_fill_rect(ctx, GRect(96, 138, 8, 8), 0, 0);
+  graphics_fill_rect(ctx, GRect(96, 165, 8, 8), 0, 0);
   
   //draw arrows of sun rise/set:
   /*
