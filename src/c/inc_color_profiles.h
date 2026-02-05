@@ -209,13 +209,6 @@
       textcolor_date               = GColorFromHEX(0xFFFFFF);
       background_color_date        = GColorFromHEX(0xAA0000);
       
-      /*
-      textcolor_weather            = GColorFromHEX(0xFFFFFF);
-      background_color_weather     = GColorFromHEX(0x000000);
-      
-      textcolor_moon               = GColorFromHEX(0xFFFFFF);
-      background_color_moon        = GColorFromHEX(0x000000);
-      */
       textcolor_weather            = GColorFromHEX(0xFFFFFF);
       background_color_weather     = GColorFromHEX(0x000000);
       
@@ -430,6 +423,34 @@
       background_color_last_update = GColorFromHEX(0xFFFFFF);
   
       background_color_lines       = GColorFromHEX(0xAAAAAA);
+    } else if (ColorProfile == 16){ // Custom theme
+      textcolor_clock              = GColorFromHEX(get_hex_from_picker_int(ClockTxtColor));
+      textcolor_seconds            = GColorFromHEX(get_hex_from_picker_int(ClockTxtColor));
+      textcolor_tz                 = GColorFromHEX(0x555555); //OK
+      textcolor_Steps              = GColorFromHEX(0x000000);
+      textcolor_cal                = GColorFromHEX(0xAAAAAA); //calendar week
+      background_color_clock       = GColorFromHEX(get_hex_from_picker_int(ClockBgColor));
+      
+      textcolor_date               = GColorFromHEX(get_hex_from_picker_int(DateTxtColor));
+      background_color_date        = GColorFromHEX(get_hex_from_picker_int(DateBgColor));
+      
+      textcolor_weather            = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
+      background_color_weather     = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
+      
+      textcolor_moon               = GColorFromHEX(0xFFFFFF);
+      background_color_moon        = GColorFromHEX(0x000000);
+      
+      textcolor_sun                = GColorFromHEX(0xFFFF00);   //=GColorYellow //OK
+      textcolor_con                = GColorFromHEX(get_hex_from_picker_int(BottombarTxtColor));   //GColorVividCerulean //connection
+      background_color_status      = GColorFromHEX(get_hex_from_picker_int(BottombarBgColor));
+      
+      textcolor_location           = GColorFromHEX(get_hex_from_picker_int(TopbarTxtColor));
+      background_color_location    = GColorFromHEX(get_hex_from_picker_int(TopbarBgColor));
+      
+      textcolor_last_update        = GColorFromHEX(get_hex_from_picker_int(TopbarTxtColor));
+      background_color_last_update = GColorFromHEX(get_hex_from_picker_int(TopbarBgColor));
+  
+      background_color_lines       = GColorFromHEX(get_hex_from_picker_int(SeperationLinesColor));      
     } else { //default = BW
       textcolor_clock              = GColorWhite;
       textcolor_seconds            = GColorWhite;

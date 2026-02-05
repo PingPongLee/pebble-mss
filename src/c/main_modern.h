@@ -128,6 +128,21 @@ GColor background_color_status;
 
 
 // Settings variables (App Config):
+static int TopbarBgColor = 0x000000;
+static int TopbarTxtColor = 0xFFFFFF;
+static int WeatherBgColor = 0x000000;
+static int WeatherTxtColor = 0xFFFFFF;
+static int DateBgColor = 0x000000;
+static int DateTxtColor = 0xFFFFFF;
+static int ClockBgColor = 0x000000;
+static int ClockTxtColor = 0xFFFFFF;
+static int ClockAltTxtColor = 0xFFFFFF;
+static int BottombarBgColor = 0x000000;
+static int BottombarTxtColor = 0xFFFFFF;
+static int SeperationLinesColor = 0xFFFFFF;
+static int WeatherIconColor = 0xFFFFFF;
+static int BatteryIconColor = 0xFFFFFF;
+
 
 static int ColorProfile = INVERT_COLORS;
 #ifndef PBL_PLATFORM_APLITE
@@ -182,7 +197,7 @@ static int cycle_color_profile = 0;
 static int health_higher_lower_than_avg = 0; //0: equal, -1: lower that avg, 1: higher than avg
 #endif
 
-
+static int get_hex_from_picker_int(int);
 static void set_cwLayer_size(void);
 static void apply_color_profile(void);
 #ifndef PBL_PLATFORM_APLITE
@@ -337,10 +352,40 @@ void LoadData(void) {
 	if (persist_exists(key)) sun_set_unix_loc = (time_t)(persist_read_int(key));
 
 
+	key = KEY_SET_TOPBARBG_COLOR;
+	if (persist_exists(key)) TopbarBgColor = persist_read_int(key);
+	key = KEY_SET_TOPBARTXT_COLOR;
+	if (persist_exists(key)) TopbarTxtColor = persist_read_int(key);
+	key = KEY_SET_WEATHERBG_COLOR;
+	if (persist_exists(key)) WeatherBgColor = persist_read_int(key);
+	key = KEY_SET_WEATHERTXT_COLOR;
+	if (persist_exists(key)) WeatherTxtColor = persist_read_int(key);
+	key = KEY_SET_DATEBG_COLOR;
+	if (persist_exists(key)) DateBgColor = persist_read_int(key);
+	key = KEY_SET_DATETXT_COLOR;
+	if (persist_exists(key)) DateTxtColor = persist_read_int(key);
+	key = KEY_SET_CLOCKBG_COLOR;
+	if (persist_exists(key)) ClockBgColor = persist_read_int(key);
+	key = KEY_SET_CLOCKTXT_COLOR;
+	if (persist_exists(key)) ClockTxtColor = persist_read_int(key);
+	key = KEY_SET_CLOCKALTTXT_COLOR;
+	if (persist_exists(key)) ClockAltTxtColor = persist_read_int(key);	
+	key = KEY_SET_BOTTOMBARBG_COLOR;
+	if (persist_exists(key)) BottombarBgColor = persist_read_int(key);
+	key = KEY_SET_BOTTOMBARTXT_COLOR;
+	if (persist_exists(key)) BottombarTxtColor = persist_read_int(key);
+	key = KEY_SET_SEPERATIONLINES_COLOR;
+	if (persist_exists(key)) SeperationLinesColor = persist_read_int(key);
+	key = KEY_SET_WEATHERICON_COLOR;
+	if (persist_exists(key)) WeatherIconColor = persist_read_int(key);
+	key = KEY_SET_BATTERYICON_COLOR;
+	if (persist_exists(key)) BatteryIconColor = persist_read_int(key);
+
 
 	key = KEY_SET_INVERT_COLOR;
 	if (persist_exists(key)) ColorProfile = persist_read_int(key);
 #ifndef PBL_PLATFORM_APLITE
+APP_LOG(APP_LOG_LEVEL_INFO, "COLLA PROFILE: %d", ColorProfile);
 	if (ColorProfile > MAX_NO_COLOR_PROFILES) cycle_color_profile = 1; else cycle_color_profile = 0;
 	if (cycle_color_profile){
 		ColorProfile = 0;
@@ -416,6 +461,22 @@ void SaveData(void) {
 
 	persist_write_int    (KEY_SUN_RISE_UNIX,  (int)sun_rise_unix_loc);
 	persist_write_int    (KEY_SUN_SET_UNIX,  (int)sun_set_unix_loc);
+
+	persist_write_int(KEY_SET_TOPBARBG_COLOR, TopbarBgColor);
+	persist_write_int(KEY_SET_TOPBARTXT_COLOR, TopbarTxtColor);
+	persist_write_int(KEY_SET_WEATHERBG_COLOR, WeatherBgColor);
+	persist_write_int(KEY_SET_WEATHERTXT_COLOR, WeatherTxtColor);
+	persist_write_int(KEY_SET_DATEBG_COLOR, DateBgColor);
+	persist_write_int(KEY_SET_DATETXT_COLOR, DateTxtColor);
+	persist_write_int(KEY_SET_CLOCKBG_COLOR, ClockBgColor);
+	persist_write_int(KEY_SET_CLOCKTXT_COLOR, ClockTxtColor);
+	persist_write_int(KEY_SET_CLOCKALTTXT_COLOR, ClockAltTxtColor);
+	persist_write_int(KEY_SET_BOTTOMBARBG_COLOR, BottombarBgColor);
+	persist_write_int(KEY_SET_BOTTOMBARTXT_COLOR, BottombarTxtColor);
+	
+	persist_write_int(KEY_SET_SEPERATIONLINES_COLOR, SeperationLinesColor);
+	persist_write_int(KEY_SET_WEATHERICON_COLOR, WeatherIconColor);
+	persist_write_int(KEY_SET_BATTERYICON_COLOR, BatteryIconColor);	
 
 #ifndef PBL_PLATFORM_APLITE
 	if (cycle_color_profile == 0)
@@ -1711,22 +1772,104 @@ static void set_cwLayer_size(void){
 #ifdef COMPILE_WITH_SECONDS
 	if (DisplaySeconds){
 		if ((TimeZoneFormat == 1) && (HealthInfo == 0)){
+			APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 1");
 			text_layer_set_text_alignment(cwLayer, GTextAlignmentCenter);
 			layer_set_frame(text_layer_get_layer(cwLayer), GRect(0+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 144, 20));
 		} else {
-			text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
-			layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
+			APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 2");
+			#if defined(PBL_PLATFORM_EMERY)
+			#else
+				text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
+				layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
+			#endif
 		}
 	} else {
-		text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-		layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
+		APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 3");
+		#if defined(PBL_PLATFORM_EMERY)
+		#else
+			text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
+			layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
+		#endif
 	}
 #endif
 #ifndef COMPILE_WITH_SECONDS
-	text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-	layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
+	APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 4");
+	//text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
+	//layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
 #endif
 #endif
+}
+
+static int get_hex_from_picker_int(int i) {
+	switch(i) {
+		case 0:  return 0x000000;
+        case 1:  return 0x000055;
+        case 2:  return 0x0000AA;
+        case 3:  return 0x0000FF;
+        case 4:  return 0x005500;
+        case 5:  return 0x005555;
+        case 6:  return 0x0055AA;
+        case 7:  return 0x0055FF;
+        case 8:  return 0x00AA00;
+        case 9:  return 0x00AA55;
+        case 10: return 0x00AAAA;
+        case 11: return 0x00AAFF;
+        case 12: return 0x00FF00;
+        case 13: return 0x00FF55;
+        case 14: return 0x00FFAA;
+        case 15: return 0x00FFFF;
+        case 16: return 0x550000;
+        case 17: return 0x550055;
+        case 18: return 0x5500AA;
+        case 19: return 0x5500FF;
+        case 20: return 0x555500;
+        case 21: return 0x555555;
+        case 22: return 0x5555AA;
+        case 23: return 0x5555FF;
+        case 24: return 0x55AA00;
+        case 25: return 0x55AA55;
+        case 26: return 0x55AAAA;
+        case 27: return 0x55AAFF;
+        case 28: return 0x55FF00;
+        case 29: return 0x55FF55;
+        case 30: return 0x55FFAA;
+        case 31: return 0x55FFFF;
+        case 32: return 0xAA0000;
+        case 33: return 0xAA0055;
+        case 34: return 0xAA00AA;
+        case 35: return 0xAA00FF;
+        case 36: return 0xAA5500;
+        case 37: return 0xAA5555;
+        case 38: return 0xAA55AA;
+        case 39: return 0xAA55FF;
+        case 40: return 0xAAAA00;
+        case 41: return 0xAAAA55;
+        case 42: return 0xAAAAAA;
+        case 43: return 0xFFFFFF;
+        case 44: return 0xAAAAFF;
+        case 45: return 0xAAFF00;
+        case 46: return 0xAAFF55;
+        case 47: return 0xAAFFAA;
+        case 48: return 0xAAFFFF;
+        case 49: return 0xFF0000;
+        case 50: return 0xFF0055;
+        case 51: return 0xFF00AA;
+        case 52: return 0xFF00FF;
+        case 53: return 0xFF5500;
+        case 54: return 0xFF55AA;
+        case 55: return 0xFF55FF;
+        case 56: return 0xFFAA00;
+        case 57: return 0xFFAA55;
+        case 58: return 0xFFAAFF;
+        case 59: return 0xFFFF00;
+        case 60: return 0xFFFF55;
+        case 61: return 0xFFFFAA;
+        case 62: return 0xFF5555;
+        case 63: return 0xFFAAAA;
+
+        default:
+            return 0x000000; // fallback
+	}
 }
 
 #ifndef PBL_PLATFORM_APLITE
@@ -2003,6 +2146,51 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 			case KEY_SUN_SET_UNIX:
 				sun_set_unix_loc = (time_t)t->value->int32;
 				break;
+
+			case KEY_SET_TOPBARBG_COLOR:
+				TopbarBgColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_TOPBARTXT_COLOR:
+				TopbarTxtColor = (int)t->value->int32;
+				break;	
+			case KEY_SET_WEATHERBG_COLOR:
+				WeatherBgColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_WEATHERTXT_COLOR:
+				WeatherTxtColor = (int)t->value->int32;
+				break;	
+			case KEY_SET_DATEBG_COLOR:
+				DateBgColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_DATETXT_COLOR:
+				DateTxtColor = (int)t->value->int32;
+				break;
+			case KEY_SET_CLOCKBG_COLOR:
+				ClockBgColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_CLOCKTXT_COLOR:
+				ClockTxtColor = (int)t->value->int32;
+				break;	
+			case KEY_SET_CLOCKALTTXT_COLOR:
+				ClockAltTxtColor = (int)t->value->int32;
+				break;					
+			case KEY_SET_BOTTOMBARBG_COLOR:
+				BottombarBgColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_BOTTOMBARTXT_COLOR:
+				BottombarTxtColor = (int)t->value->int32;
+				break;	
+				
+			case KEY_SET_SEPERATIONLINES_COLOR:
+				SeperationLinesColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_WEATHERICON_COLOR:
+				WeatherIconColor = (int)t->value->int32;
+				break;		
+			case KEY_SET_BATTERYICON_COLOR:
+				BatteryIconColor = (int)t->value->int32;
+				break;																			
+				
 			case KEY_SET_INVERT_COLOR:
 				ColorProfile = (int)t->value->int32;
 #ifndef PBL_PLATFORM_APLITE
@@ -2268,6 +2456,7 @@ static void main_window_load(Window *window) {
 #else
 	//APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
 #endif
+
 
 
 	// Register callbacks

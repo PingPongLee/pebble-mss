@@ -35,7 +35,7 @@
     
     graphics_context_set_fill_color(ctx, background_color_weather);
     graphics_context_set_stroke_color(ctx, background_color_weather);
-    graphics_fill_rect(ctx, GRect( 0, 69, 118, 24), 0, 0);
+    graphics_fill_rect(ctx, GRect( 0, 69, 118, 25), 0, 0);
     graphics_fill_rect(ctx, GRect(119, 23, 81, 71), 0, 0);
     
     // weather icon bg
