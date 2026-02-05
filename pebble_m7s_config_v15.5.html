@@ -182,6 +182,47 @@
       <option value="16">16: Cycle through all (3 sec./color, only on PT(S/R))</option>
     </select>
     </p>
+    <p><h3>Custom theme:</h3>
+      <br>
+      On old pebble watches (Aplite platform), colored selection will fallback to white on black.
+      <br>
+      Main background color
+      <select id="mainbg_color_select" size="16">
+        <option value="0">White</option>
+      </select>
+      <select id="mainbg_color_select" size="16">
+        <option value="1">Black</option>
+      </select>
+      <select id="mainbg_color_select" size="16">
+        <option value="2">Darkblue</option>
+      </select>
+      <select id="mainbg_color_select" size="16">
+        <option value="3">Orange</option>
+      </select>  
+      <select id="maintxt_color_select" size="16">
+        <option value="4">Yellow</option>
+      </select>               
+      <br>
+      On old pebble watches (Aplite platform), colored selection will fallback to white on black.
+      <br>
+      Main text color
+      <select id="maintxt_color_select" size="16">
+        <option value="0">White</option>
+      </select>
+      <select id="maintxt_color_select" size="16">
+        <option value="1">Black</option>
+      </select>
+      <select id="maintxt_color_select" size="16">
+        <option value="2">Darkblue</option>
+      </select>
+      <select id="maintxt_color_select" size="16">
+        <option value="3">Orange</option>
+      </select>
+      <select id="maintxt_color_select" size="16">
+        <option value="4">Yellow</option>
+      </select>         
+
+    </p>    
     <p>Colored Temperature (only watches with colored display):
     <br>
     <select id="color_temp_select" size="2">
@@ -359,7 +400,7 @@
           "light": light_select.selectedIndex,
           "display_sec": dsSelect.selectedIndex,
           "date_format": dfSelect.options[dfSelect.selectedIndex].value, //not working with %
-		  "date_format_index": dfSelect.selectedIndex, //only used for internal storage in browser
+		      "date_format_index": dfSelect.selectedIndex, //only used for internal storage in browser
           "time_zone_info": timeZoneSelect.selectedIndex,
           "health_info": healthSelect.selectedIndex,
           "vibe_disconnect": vdSelect.selectedIndex,
