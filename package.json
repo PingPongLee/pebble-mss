@@ -113,7 +113,6 @@
                 },
                 {
                     "file": "images/sleep.png",
-                    "memoryFormat": "1Bit",
                     "name": "IMAGE_HEALTH_SLEEP",
                     "targetPlatforms": [
                         "emery"
