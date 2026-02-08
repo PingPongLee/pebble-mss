@@ -83,7 +83,7 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/Soles-feet-30x35px.png",
+                    "file": "images/steps_sm.png",
                     "name": "IMAGE_HEALTH_STEPS",
                     "targetPlatforms": [
                         "basalt",
@@ -101,8 +101,7 @@
                     "type": "bitmap"
                 },
                 {
-                    "file": "images/Sleep_30x26.png",
-                    "memoryFormat": "1Bit",
+                    "file": "images/sleep_sm.png",
                     "name": "IMAGE_HEALTH_SLEEP",
                     "targetPlatforms": [
                         "basalt",
