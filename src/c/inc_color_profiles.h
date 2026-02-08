@@ -426,9 +426,9 @@
     } else if (ColorProfile == 16){ // Custom theme
       textcolor_clock              = GColorFromHEX(get_hex_from_picker_int(ClockTxtColor));
       textcolor_seconds            = GColorFromHEX(get_hex_from_picker_int(ClockTxtColor));
-      textcolor_tz                 = GColorFromHEX(0x555555); //OK
-      textcolor_Steps              = GColorFromHEX(0x000000);
-      textcolor_cal                = GColorFromHEX(0xAAAAAA); //calendar week
+      textcolor_tz                 = GColorFromHEX(get_hex_from_picker_int(ClockAltTxtColor)); //OK
+      textcolor_Steps              = GColorFromHEX(get_hex_from_picker_int(ClockAltTxtColor));
+      textcolor_cal                = GColorFromHEX(get_hex_from_picker_int(ClockAltTxtColor)); //calendar week
       background_color_clock       = GColorFromHEX(get_hex_from_picker_int(ClockBgColor));
       
       textcolor_date               = GColorFromHEX(get_hex_from_picker_int(DateTxtColor));
@@ -437,10 +437,15 @@
       textcolor_weather            = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
       background_color_weather     = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
       
-      textcolor_moon               = GColorFromHEX(0xFFFFFF);
-      background_color_moon        = GColorFromHEX(0x000000);
-      
-      textcolor_sun                = GColorFromHEX(0xFFFF00);   //=GColorYellow //OK
+      if(WeatherIconColor<2) {
+        textcolor_moon               = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
+        background_color_moon        = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
+      } else {
+        textcolor_moon               = GColorFromHEX(0xFFFFFF);
+        background_color_moon        = GColorFromHEX(0x000000);
+      }
+
+      textcolor_sun                = GColorFromHEX(get_hex_from_picker_int(BottombarTxtColor));   //=GColorYellow //OK
       textcolor_con                = GColorFromHEX(get_hex_from_picker_int(BottombarTxtColor));   //GColorVividCerulean //connection
       background_color_status      = GColorFromHEX(get_hex_from_picker_int(BottombarBgColor));
       

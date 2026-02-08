@@ -140,8 +140,8 @@ static int ClockAltTxtColor = 0xFFFFFF;
 static int BottombarBgColor = 0x000000;
 static int BottombarTxtColor = 0xFFFFFF;
 static int SeperationLinesColor = 0xFFFFFF;
-static int WeatherIconColor = 0xFFFFFF;
-static int BatteryIconColor = 0xFFFFFF;
+static int WeatherIconColor = 2;
+static int BatteryIconColor = 2;
 
 
 static int ColorProfile = INVERT_COLORS;
@@ -678,6 +678,8 @@ static GColor get_weather_icon_color(int nr){
 	if (ColorProfile == 0) return GColorWhite;
 	if (ColorProfile == 1) return GColorBlack;
 #ifndef PBL_PLATFORM_APLITE
+	if(WeatherIconColor==0) return GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));	
+
 	if (nr < 33) return GColorWhite;
 	if (nr > 106) return GColorWhite;
 	switch (nr){
@@ -766,6 +768,7 @@ static GColor get_weather_icon_bkgr_color(int nr){
 	if (ColorProfile == 0) return GColorBlack;
 	if (ColorProfile == 1) return GColorWhite;
 #ifndef PBL_PLATFORM_APLITE
+	if(WeatherIconColor<2) return GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));	
 	if (nr < 33) return GColorBlack;
 	if (nr > 106) return GColorBlack;
 	switch (nr){
@@ -1296,16 +1299,12 @@ static void handle_battery(BatteryChargeState charge_state) {
 	#if defined(PBL_PLATFORM_EMERY)
 		layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(3+X_OFFSET, 30+Y_OFFSET-obstruction_shift, (int)54*actual_battery_percent/100, 16));
 		//layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(0, 0-obstruction_shift, 180, 180));
-		layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
-
-		uint8_t variable_color = 0;
 	#else
 		layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(3+X_OFFSET, 21+Y_OFFSET-obstruction_shift, (int)38*actual_battery_percent/100, 11));
 		//layer_set_frame(effect_layer_get_layer(s_battery_layer_fill), GRect(0, 0-obstruction_shift, 180, 180));
-		layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
-
-		uint8_t variable_color = 0;
 	#endif
+	layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
+	uint8_t variable_color = 0;
 
 
 	#ifdef PBL_PLATFORM_CHALK
@@ -1318,12 +1317,24 @@ static void handle_battery(BatteryChargeState charge_state) {
 		}
 	#else
 		if (actual_battery_percent > 20){
-			variable_color = 0b11000100; // 30-100 %
-			//variable_color = 0b11111111; // 30-100 %          
+			if(BatteryIconColor==2) {
+				variable_color = 0b11000100;
+			} else {
+				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
+			}			
+			//variable_color = 0b11000100; // 30-100 %          
 		} else if (actual_battery_percent > 10){
-			variable_color = 0b11110100; // 20 %          dark orange (GColorOrange)
+			if(BatteryIconColor>=1) {
+				variable_color = 0b11110100; // 20 %          dark orange (GColorOrange)
+			} else {
+				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
+			}	
 		} else {
-			variable_color = 0b11110000; //  0 % -  10 %  red (GColorRed)
+			if(BatteryIconColor>=1) {
+				variable_color = 0b11110000; //  0 % -  10 %  red (GColorRed)
+			} else {
+				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
+			}			
 		}
 	#endif
 
@@ -1335,12 +1346,20 @@ static void handle_battery(BatteryChargeState charge_state) {
 			textcolor_bat_uint8 = 0b11000000; //black
 			bkgrcolor_bat_uint8 = 0b11111111; //white
 		} else {
-			textcolor_bat_uint8 = 0b11111111;
+			if(BatteryIconColor==2) {
+				textcolor_bat_uint8 = 0b11111111;
+			} else {
+				textcolor_bat_uint8 = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor)).argb; 
+			}
 			bkgrcolor_bat_uint8 = variable_color;
 		}
 		//On all Profiles, make battery white on red if <= 20%:
 		if (actual_battery_percent <= 20){
-			textcolor_bat_uint8 = 0b11111111;
+			if(BatteryIconColor>=1) {
+				textcolor_bat_uint8 = 0b11111111; //  0 % -  10 %  red (GColorRed)
+			} else {
+				textcolor_bat_uint8 = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor)).argb;
+			}	
 			bkgrcolor_bat_uint8 = variable_color;
 		}
 
@@ -1359,14 +1378,38 @@ static void handle_battery(BatteryChargeState charge_state) {
 			}
 		}
 	#endif
-
-
-		GlobalInverterColor = textcolor_bat_uint8 & 0b00111111;
-		//GlobalInverterColor = textcolor_bat_uint8 & 0b00000000;
+	
+		/*GlobalInverterColor = textcolor_bat_uint8 & 0b00111111;
 		GlobalBkgColor      = bkgrcolor_bat_uint8 & 0b00111111;
 		textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
-		bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
-		//bkgrcolor_bat		= GColorFromHEX(0x00307d);
+		bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};*/
+
+		GlobalInverterColor = textcolor_bat_uint8 & 0b00111111;
+		GlobalBkgColor      = bkgrcolor_bat_uint8 & 0b00111111;
+
+		if(BatteryIconColor==2) {
+			textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
+			bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
+		} else if (BatteryIconColor==1){
+			if (actual_battery_percent > 20){
+				textcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
+				bkgrcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
+			} else {
+				textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
+				bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
+			}
+		} else {
+			textcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
+			bkgrcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
+		}		
+
+
+		/*GlobalInverterColor = 0b00000000;
+		//GlobalInverterColor = textcolor_bat_uint8 & 0b00000000;
+		GlobalBkgColor      = 0b11011010;
+		textcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
+		bkgrcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));*/
+
 	#endif
 	text_layer_set_text_color(battery_runtime_layer, textcolor_bat);
 	layer_mark_dirty(background_paint_layer);
