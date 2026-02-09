@@ -1306,37 +1306,34 @@ static void handle_battery(BatteryChargeState charge_state) {
 	layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
 	uint8_t variable_color = 0;
 
-
 	#ifdef PBL_PLATFORM_CHALK
-		if (actual_battery_percent > 30){
-			variable_color = 0b11000100; // 40-100 %          
-		} else if (actual_battery_percent > 20){
-			variable_color = 0b11110100; // 30 %          dark orange (GColorOrange)
-		} else {
-			variable_color = 0b11110000; //  0 % -  20 %  red (GColorRed)
-		}
+		int normal = 30;
+		int low = 20;		
 	#else
-		if (actual_battery_percent > 20){
-			if(BatteryIconColor==2) {
-				variable_color = 0b11000100;
-			} else {
-				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
-			}			
-			//variable_color = 0b11000100; // 30-100 %          
-		} else if (actual_battery_percent > 10){
-			if(BatteryIconColor>=1) {
-				variable_color = 0b11110100; // 20 %          dark orange (GColorOrange)
-			} else {
-				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
-			}	
-		} else {
-			if(BatteryIconColor>=1) {
-				variable_color = 0b11110000; //  0 % -  10 %  red (GColorRed)
-			} else {
-				variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; // 30-100 %
-			}			
-		}
+		int normal = 20;
+		int low = 10;
 	#endif
+
+
+	if (actual_battery_percent > normal){ //40-100% for chalk, 30-100% for others
+		if(BatteryIconColor==2) {
+			variable_color = 0b11000100; // dark green
+		} else {
+			variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb;
+		}			          
+	} else if (actual_battery_percent > low){ //30% for chalk, 20% for others
+		if(BatteryIconColor>=1) {
+			variable_color = 0b11110100; // dark orange (GColorOrange)
+		} else {
+			variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; 
+		}	
+	} else {
+		if(BatteryIconColor>=1) { //0-20% for chalk, 0-10% for others
+			variable_color = 0b11110000; // red (GColorRed)
+		} else {
+			variable_color = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor)).argb; 
+		}			
+	}
 
 
 		if (ColorProfile == 0) {
@@ -1356,7 +1353,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 		//On all Profiles, make battery white on red if <= 20%:
 		if (actual_battery_percent <= 20){
 			if(BatteryIconColor>=1) {
-				textcolor_bat_uint8 = 0b11111111; //  0 % -  10 %  red (GColorRed)
+				textcolor_bat_uint8 = 0b11111111; 
 			} else {
 				textcolor_bat_uint8 = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor)).argb;
 			}	

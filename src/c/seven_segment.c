@@ -467,6 +467,7 @@ void seven_segment_55_paint_segment_1(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(05+pos.x,04+pos.y), GPoint(30+pos.x,04+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,05+pos.y), GPoint(29+pos.x,05+pos.y));
   graphics_draw_line(ctx, GPoint(07+pos.x,06+pos.y), GPoint(28+pos.x,06+pos.y));
+  graphics_draw_line(ctx, GPoint(8+pos.x,07+pos.y), GPoint(27+pos.x,07+pos.y));  
 }
 
 void seven_segment_55_paint_segment_2(GContext* ctx, GPoint pos) {
@@ -476,7 +477,8 @@ void seven_segment_55_paint_segment_2(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(03+pos.x,05+pos.y), GPoint(03+pos.x,25+pos.y));
   graphics_draw_line(ctx, GPoint(04+pos.x,06+pos.y), GPoint(04+pos.x,24+pos.y));
   graphics_draw_line(ctx, GPoint(05+pos.x,07+pos.y), GPoint(05+pos.x,23+pos.y));
-  graphics_draw_line(ctx, GPoint(06+pos.x,8+pos.y), GPoint(06+pos.x,22+pos.y));  
+  graphics_draw_line(ctx, GPoint(06+pos.x,8+pos.y), GPoint(06+pos.x,22+pos.y));
+  graphics_draw_line(ctx, GPoint(07+pos.x,9+pos.y), GPoint(07+pos.x,21+pos.y));   
 }
 
 void seven_segment_55_paint_segment_3(GContext* ctx, GPoint pos) {
@@ -486,7 +488,8 @@ void seven_segment_55_paint_segment_3(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(32+pos.x,05+pos.y), GPoint(32+pos.x,25+pos.y));
   graphics_draw_line(ctx, GPoint(31+pos.x,06+pos.y), GPoint(31+pos.x,24+pos.y));
   graphics_draw_line(ctx, GPoint(30+pos.x,07+pos.y), GPoint(30+pos.x,23+pos.y));  
-  graphics_draw_line(ctx, GPoint(29+pos.x,8+pos.y), GPoint(29+pos.x,22+pos.y));   
+  graphics_draw_line(ctx, GPoint(29+pos.x,8+pos.y), GPoint(29+pos.x,22+pos.y));
+  graphics_draw_line(ctx, GPoint(28+pos.x,9+pos.y), GPoint(28+pos.x,21+pos.y));   
 }
 
 void seven_segment_55_paint_segment_4(GContext* ctx, GPoint pos) {
@@ -495,9 +498,11 @@ void seven_segment_55_paint_segment_4(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(05+pos.x,26+pos.y), GPoint(30+pos.x,26+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,25+pos.y), GPoint(29+pos.x,25+pos.y));
   graphics_draw_line(ctx, GPoint(07+pos.x,24+pos.y), GPoint(28+pos.x,24+pos.y));
+  //graphics_draw_line(ctx, GPoint(8+pos.x,23+pos.y), GPoint(27+pos.x,23+pos.y));
+  
   graphics_draw_line(ctx, GPoint(05+pos.x,29+pos.y), GPoint(30+pos.x,29+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,30+pos.y), GPoint(29+pos.x,30+pos.y));
-  //graphics_draw_line(ctx, GPoint(07+pos.x,31+pos.y), GPoint(28+pos.x,31+pos.y));
+  graphics_draw_line(ctx, GPoint(07+pos.x,31+pos.y), GPoint(28+pos.x,31+pos.y));
     
 }
 
@@ -509,6 +514,7 @@ void seven_segment_55_paint_segment_5(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(04+pos.x,49+pos.y), GPoint(04+pos.x,31+pos.y));
   graphics_draw_line(ctx, GPoint(05+pos.x,48+pos.y), GPoint(05+pos.x,32+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,47+pos.y), GPoint(06+pos.x,33+pos.y));    
+  graphics_draw_line(ctx, GPoint(07+pos.x,46+pos.y), GPoint(07+pos.x,34+pos.y));
 }
 
 void seven_segment_55_paint_segment_6(GContext* ctx, GPoint pos) {
@@ -518,7 +524,8 @@ void seven_segment_55_paint_segment_6(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(32+pos.x,50+pos.y), GPoint(32+pos.x,30+pos.y));
   graphics_draw_line(ctx, GPoint(31+pos.x,49+pos.y), GPoint(31+pos.x,31+pos.y));
   graphics_draw_line(ctx, GPoint(30+pos.x,48+pos.y), GPoint(30+pos.x,32+pos.y));  
-  graphics_draw_line(ctx, GPoint(29+pos.x,47+pos.y), GPoint(29+pos.x,33+pos.y));   
+  graphics_draw_line(ctx, GPoint(29+pos.x,47+pos.y), GPoint(29+pos.x,33+pos.y));
+  graphics_draw_line(ctx, GPoint(28+pos.x,46+pos.y), GPoint(28+pos.x,34+pos.y));   
 }
 
 void seven_segment_55_paint_segment_7(GContext* ctx, GPoint pos) {
@@ -529,6 +536,7 @@ void seven_segment_55_paint_segment_7(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(05+pos.x,51+pos.y), GPoint(30+pos.x,51+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,50+pos.y), GPoint(29+pos.x,50+pos.y)); 
   graphics_draw_line(ctx, GPoint(07+pos.x,49+pos.y), GPoint(28+pos.x,49+pos.y));   
+  graphics_draw_line(ctx, GPoint(8+pos.x,48+pos.y), GPoint(27+pos.x,48+pos.y)); 
 }
 
 #else
@@ -635,7 +643,7 @@ void seven_segment_41_paint_segment_7(GContext* ctx, GPoint pos) {
   graphics_draw_line(ctx, GPoint(04+pos.x,38+pos.y), GPoint(21+pos.x,38+pos.y));
   graphics_draw_line(ctx, GPoint(05+pos.x,37+pos.y), GPoint(20+pos.x,37+pos.y));
   graphics_draw_line(ctx, GPoint(06+pos.x,36+pos.y), GPoint(19+pos.x,36+pos.y));
-  graphics_draw_line(ctx, GPoint(07+pos.x,35+pos.y), GPoint(18+pos.x,35+pos.y));
+  graphics_draw_line(ctx, GPoint(07+pos.x,35+pos.y), GPoint(18+pos.x,35+pos.y));  
 }
 
 void seven_segment_41_clear(GContext* ctx, GPoint pos){

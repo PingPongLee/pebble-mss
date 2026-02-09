@@ -38,7 +38,7 @@ static void move_layers(void) {
 #ifndef PBL_PLATFORM_APLITE
 	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,185,23,23);
 	MOVE_LAYER(s_layer_health_up_down, 25, 187, 23, 23);
-	MOVE_TEXT_LAYER(text_layer_health, 25+23, 178, 90, 30); //TODO
+	MOVE_TEXT_LAYER(text_layer_health, 25+23, 180, 90, 30); //TODO
 #endif
 }
 
