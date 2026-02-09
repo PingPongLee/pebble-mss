@@ -1821,17 +1821,17 @@ static void set_cwLayer_size(void){
 			layer_set_frame(text_layer_get_layer(cwLayer), GRect(0+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 144, 20));
 		} else {
 			APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 2");
+			text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
 			#if defined(PBL_PLATFORM_EMERY)
 			#else
-				text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
 				layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
 			#endif
 		}
 	} else {
 		APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 3");
+		text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
 		#if defined(PBL_PLATFORM_EMERY)
 		#else
-			text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
 			layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
 		#endif
 	}
@@ -1976,7 +1976,7 @@ static void health_handler(HealthEventType event, void *context) {
 	if (HealthInfo == 3) do_update = 2; // allays steps
 	if (HealthInfo == 4) do_update = 3; // allays sleep
 
-	//do_update = 3;
+	do_update = 3;
 
 	health_higher_lower_than_avg = 0;
 

@@ -2,14 +2,14 @@
     "author": "djda9l",
     "dependencies": {},
     "keywords": [],
-    "name": "m7s_wf_20",
+    "name": "m7sr_wf_1",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "M7S_20",
+        "displayName": "Multifunctional 7 Segment Reborn",
         "enableMultiJS": true,
         "messageKeys": {
             "KEY_SET_TOPBARBG_COLOR": 60, 
@@ -82,6 +82,12 @@
         "projectType": "native",
         "resources": {
             "media": [
+                {
+                    "file": "images/icon.png",
+                    "name": "MENU_ICON",
+                    "type": "bitmap",
+                    "menuIcon": true
+                },                
                 {
                     "file": "images/steps_sm.png",
                     "name": "IMAGE_HEALTH_STEPS",
@@ -158,10 +164,10 @@
             "diorite",
             "emery"
         ],
-        "uuid": "03adc57a-569b-4669-9a80-b505eaea314d",
+        "uuid": "34c2f43a-81c9-4031-ac03-897f445d7eea",
         "watchapp": {
             "watchface": true
         }
     },
-    "version": "20.0.0"
+    "version": "1.0.0"
 }
