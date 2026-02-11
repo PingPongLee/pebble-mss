@@ -775,7 +775,7 @@ Pebble.addEventListener("showConfiguration",
 
                             // Pebble.openURL("https://googledrive.com/host/0B3ivuMdwFLKzfnRGRFRHaXdJbGVRd0FsUElteEVybVZhSHBjM3YzQWRwa0loYUVqaG1JaWM/pebble_m7s_config_v15.3.html");
                             //Pebble.openURL("https://rawgit.com/cfg1/pebble-mss/master/pebble_m7s_config_v15.5.html");
-                            Pebble.openURL("http://192.168.1.2:13371");
+                            Pebble.openURL("http://besthest.dk/7segment/");
 
                             //TODO: send some usefull values to the settings page (e. g. location, battery staistics etc.) by adding ?xxx to the URL
                         }

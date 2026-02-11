@@ -1973,7 +1973,7 @@ static void health_handler(HealthEventType event, void *context) {
 	if (HealthInfo == 3) do_update = 2; // allays steps
 	if (HealthInfo == 4) do_update = 3; // allays sleep
 
-	do_update = 3;
+	//do_update = 3;
 
 	health_higher_lower_than_avg = 0;
 
