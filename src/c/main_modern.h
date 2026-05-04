@@ -385,7 +385,6 @@ void LoadData(void) {
 	key = KEY_SET_INVERT_COLOR;
 	if (persist_exists(key)) ColorProfile = persist_read_int(key);
 #ifndef PBL_PLATFORM_APLITE
-APP_LOG(APP_LOG_LEVEL_INFO, "COLLA PROFILE: %d", ColorProfile);
 	if (ColorProfile > MAX_NO_COLOR_PROFILES) cycle_color_profile = 1; else cycle_color_profile = 0;
 	if (cycle_color_profile){
 		ColorProfile = 0;
@@ -1813,11 +1812,9 @@ static void set_cwLayer_size(void){
 #ifdef COMPILE_WITH_SECONDS
 	if (DisplaySeconds){
 		if ((TimeZoneFormat == 1) && (HealthInfo == 0)){
-			APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 1");
 			text_layer_set_text_alignment(cwLayer, GTextAlignmentCenter);
 			layer_set_frame(text_layer_get_layer(cwLayer), GRect(0+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 144, 20));
 		} else {
-			APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 2");
 			text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
 			#if defined(PBL_PLATFORM_EMERY)
 			#else
@@ -1825,7 +1822,6 @@ static void set_cwLayer_size(void){
 			#endif
 		}
 	} else {
-		APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 3");
 		text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
 		#if defined(PBL_PLATFORM_EMERY)
 		#else
@@ -1834,7 +1830,6 @@ static void set_cwLayer_size(void){
 	}
 #endif
 #ifndef COMPILE_WITH_SECONDS
-	APP_LOG(APP_LOG_LEVEL_INFO, "set_cwLayer_size -> sector 4");
 	//text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
 	//layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
 #endif
@@ -1992,8 +1987,6 @@ static void health_handler(HealthEventType event, void *context) {
 			strcpy(unit, " ");
 		}
     
-    
-    
 		time_t start = time_start_of_today();
 		time_t end = time(NULL);
 		// Check the metric has data available for today
@@ -2003,8 +1996,6 @@ static void health_handler(HealthEventType event, void *context) {
 
 		if (mask & HealthServiceAccessibilityMaskAvailable) {
 			// Data is available!
-			//APP_LOG(APP_LOG_LEVEL_INFO, "Steps today: %d", (int)health_service_sum_today(metric));
-
 			HealthValue today = health_service_sum_today(metric);
 			HealthValue average = (HealthValue)0;
 			if (mask_avg & HealthServiceAccessibilityMaskAvailable) {
@@ -2055,7 +2046,7 @@ static void health_handler(HealthEventType event, void *context) {
 #endif
 
 static void layer_update_callback_health_up_down(Layer *layer, GContext* ctx){
-	health_higher_lower_than_avg = -1;
+	//health_higher_lower_than_avg = 1;
 	#if defined(PBL_PLATFORM_EMERY)
 		int multiplier = 18;
 		int pos = 19;
@@ -2064,9 +2055,23 @@ static void layer_update_callback_health_up_down(Layer *layer, GContext* ctx){
 		int pos = 10;
 	#endif
 
-	graphics_context_set_fill_color(ctx, background_color_clock);
-	graphics_fill_rect(ctx, GRect(0, 0, pos, pos), 0, GCornerNone);
-	graphics_context_set_stroke_color(ctx, textcolor_Steps_actual);
+	if(health_higher_lower_than_avg == 0) {
+		#if defined(PBL_PLATFORM_EMERY)
+			layer_set_frame(text_layer_get_layer(text_layer_health), GRect(25, 180, 90, 30)); // Todo: fix hardcode and use vals from inc_main_load_x.h
+		#else
+			layer_set_frame(text_layer_get_layer(text_layer_health), GRect(14, 132, 100, 20)); // Todo: fix hardcode and use vals from inc_main_load_x.h
+		#endif
+		
+	} else {
+		#if defined(PBL_PLATFORM_EMERY)
+			layer_set_frame(text_layer_get_layer(text_layer_health), GRect(25+23, 180, 90, 30)); // Todo: fix hardcode and use vals from inc_main_load_x.h
+		#else
+			layer_set_frame(text_layer_get_layer(text_layer_health), GRect(14+10, 132, 100, 20)); // Todo: fix hardcode and use vals from inc_main_load_x.h
+		#endif		
+		graphics_context_set_fill_color(ctx, background_color_clock);
+		graphics_fill_rect(ctx, GRect(0, 0, pos, pos), 0, GCornerNone);
+		graphics_context_set_stroke_color(ctx, textcolor_Steps_actual);
+	}
 
 	if (health_higher_lower_than_avg > 0){
 		//TODO: paint arrow up

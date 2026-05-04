@@ -3,13 +3,17 @@
 
 static void move_layers(void) {
 	MOVE_LAYER(background_paint_layer, 0, 0, 200, 228);
-	MOVE_LAYER(s_image_layer_hour_1, 4, 127, 40, 56);
-	MOVE_LAYER(s_image_layer_hour_2, 51, 127, 40, 56);
+	/*MOVE_LAYER(s_image_layer_hour_1, 4, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_hour_2, 56, 127, 40, 56);
 	MOVE_LAYER(s_image_layer_minute_1, 113, 127, 40, 56);
-	MOVE_LAYER(s_image_layer_minute_2, 162, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_minute_2, 162, 127, 40, 56);*/
+  MOVE_LAYER(s_image_layer_hour_1, 12, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_hour_2, 55, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_minute_1, 108, 127, 40, 56);
+	MOVE_LAYER(s_image_layer_minute_2, 154, 127, 40, 56);  
 #ifdef COMPILE_WITH_SECONDS
-	MOVE_LAYER(s_image_layer_second_1, 168, 186, 30, 35);
-	MOVE_LAYER(s_image_layer_second_2, 184, 186, 30, 35);
+	MOVE_LAYER(s_image_layer_second_1, 162, 186, 30, 35);
+	MOVE_LAYER(s_image_layer_second_2, 179, 186, 30, 35);
 #endif
 	MOVE_TEXT_LAYER(text_sunrise_layer, 12, 206, 69, 38);
 	MOVE_TEXT_LAYER(text_sunset_layer, 167, 206, 69, 38);
@@ -26,7 +30,7 @@ static void move_layers(void) {
 	MOVE_LAYER(battery_layer, 3, 46, (int)53*battery.charge_percent/100, 15);
 
 	MOVE_TEXT_LAYER(Date_Layer, 5, 89, 186, 30);
-	MOVE_TEXT_LAYER(cwLayer, 125, 184, 73, 20);
+	MOVE_TEXT_LAYER(cwLayer, 120, 184, 73, 20);
 	MOVE_TEXT_LAYER(moonLayer_IMG, 71, NightMode ? 129 : 5, 46, 45);
 
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 69, 19, 130, 41);
