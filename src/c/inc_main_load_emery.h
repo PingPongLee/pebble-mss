@@ -27,11 +27,11 @@ static void move_layers(void) {
 	battery_layer = effect_layer_get_layer(s_battery_layer_fill);
 #endif
 	BatteryChargeState battery = battery_state_service_peek();
-	MOVE_LAYER(battery_layer, 3, 46, (int)53*battery.charge_percent/100, 15);
+	MOVE_LAYER(battery_layer, 3, 30, (int)53*battery.charge_percent/100, 16);
 
 	MOVE_TEXT_LAYER(Date_Layer, 5, 89, 186, 30);
 	MOVE_TEXT_LAYER(cwLayer, 120, 184, 73, 20);
-	MOVE_TEXT_LAYER(moonLayer_IMG, 71, NightMode ? 129 : 5, 46, 45);
+	MOVE_TEXT_LAYER(moonLayer_IMG, 69, NightMode ? 26 : 23, 46, 45);
 
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 69, 19, 130, 41);
 	MOVE_TEXT_LAYER(weather_layer_3_location, 0, -1, 152, 23);

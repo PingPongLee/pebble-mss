@@ -2388,12 +2388,20 @@ static void unobstructed_area_will_change(GRect final_unobstructed_area, void *c
 }
 
 static void unobstructed_area_change(AnimationProgress progress, void *context) {
+#if defined(PBL_PLATFORM_EMERY)
+	obstruction_shift = 20 * progress / (ANIMATION_NORMALIZED_MAX - ANIMATION_NORMALIZED_MIN);
+	if (will_be_obstructed) {
+		// revert it
+		obstruction_shift = 20 - obstruction_shift;
+	}
+#else
 	obstruction_shift = 18 * progress / (ANIMATION_NORMALIZED_MAX - ANIMATION_NORMALIZED_MIN);
 	if (will_be_obstructed) {
 		// revert it
 		obstruction_shift = 18 - obstruction_shift;
 	}
-	APP_LOG(APP_LOG_LEVEL_INFO, "Animation progress: %d, shift %d", progress, obstruction_shift);
+#endif
+	//APP_LOG(APP_LOG_LEVEL_INFO, "Animation progress: %d, shift %d", progress, obstruction_shift);
 #ifdef MOVE_LAYER
 	// update layer positions, but only if we support that for this platform
 	move_layers();
