@@ -37,7 +37,7 @@ static void move_layers(void) {
 	MOVE_TEXT_LAYER(text_TimeZone_layer, 5, 132, 100, 20); //TODO
 #ifndef PBL_PLATFORM_APLITE
 	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,137,15,14);
-	MOVE_TEXT_LAYER(text_layer_health, 14+10, 132, 100, 20); //TODO
+	MOVE_TEXT_LAYER(text_layer_health, 14+12, 132, 100, 20); //TODO
 	MOVE_LAYER(s_layer_health_up_down, 14, 140, 10, 10);
 #endif
 }
