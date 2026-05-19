@@ -683,7 +683,9 @@ static GColor get_weather_icon_color(int nr){
 	if (ColorProfile == 0) return GColorWhite;
 	if (ColorProfile == 1) return GColorBlack;
 #ifndef PBL_PLATFORM_APLITE
-	if(WeatherIconColor==0) return GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));	
+	if(WeatherIconColor==0 && ColorProfile==16) { // Return color based on custom theme, but ofcourse only if that theme is selected
+		return GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));	
+	} 
 
 	if (nr < 33) return GColorWhite;
 	if (nr > 106) return GColorWhite;
@@ -773,7 +775,9 @@ static GColor get_weather_icon_bkgr_color(int nr){
 	if (ColorProfile == 0) return GColorBlack;
 	if (ColorProfile == 1) return GColorWhite;
 #ifndef PBL_PLATFORM_APLITE
-	if(WeatherIconColor<2) return GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));	
+	if(WeatherIconColor<2 && ColorProfile==16) { // Return color based on custom theme, but ofcourse only if that theme is selected
+		return GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));	
+	}
 	if (nr < 33) return GColorBlack;
 	if (nr > 106) return GColorBlack;
 	switch (nr){
