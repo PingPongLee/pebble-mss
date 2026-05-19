@@ -200,6 +200,7 @@ static int health_higher_lower_than_avg = 0; //0: equal, -1: lower that avg, 1: 
 
 static int get_hex_from_picker_int(int);
 static void set_cwLayer_size(void);
+static void set_text_TimeZone_layer_size(void);
 static void apply_color_profile(void);
 #ifndef PBL_PLATFORM_APLITE
 static void update_health_icon_colors(GColor color);
@@ -1136,6 +1137,7 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 		} else if (TimeZoneFormat == 2){
 			snprintf(buffer_9, sizeof(buffer_9), "%s, %s", hour_mode_str, time_ZONE_NAME);
 		}
+		set_text_TimeZone_layer_size();
 		text_layer_set_text(text_TimeZone_layer, buffer_9);
 	}
 
@@ -1852,6 +1854,35 @@ static void set_cwLayer_size(void){
 #endif
 }
 
+static void set_text_TimeZone_layer_size(void) {
+#if defined(PBL_PLATFORM_CHALK)
+	int x = 35;
+	int y = 132 + Y_OFFSET;
+	int h = 20;
+	int w = 75;
+#elif defined(PBL_PLATFORM_EMERY)
+	int x = 5;
+	int y = 184;
+	int h = 20;
+	int w = 110;
+#else
+	int x = 1;
+	int y = 132;
+	int h = 20;
+	int w = 70;
+#endif
+	if (!DisplaySeconds) {
+		#if defined(PBL_PLATFORM_CHALK)
+				w = 104; // up to where second digits sit on the clock row
+		#elif defined(PBL_PLATFORM_EMERY)
+				w = 155; // up to calendar-week label at x=120
+		#else
+				w = 105; // up to where second digits sit at x=113
+		#endif
+	}
+	layer_set_frame(text_layer_get_layer(text_TimeZone_layer), GRect(x, y - obstruction_shift, w, h));
+}
+
 static int get_hex_from_picker_int(int i) {
 	switch(i) {
 		case 0:  return 0x000000;
@@ -2271,6 +2302,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 				DisplaySeconds = (int)t->value->int32;
 				//APP_LOG(APP_LOG_LEVEL_INFO, "DisplaySeconds = %d", DisplaySeconds);
 				set_cwLayer_size();
+				set_text_TimeZone_layer_size();
 				layer_mark_dirty(s_image_layer_second_1);
 				layer_mark_dirty(s_image_layer_second_2);
 				tick_timer_service_unsubscribe();

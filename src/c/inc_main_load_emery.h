@@ -38,7 +38,7 @@ static void move_layers(void) {
 	MOVE_TEXT_LAYER(weather_layer_4_last_update, 153, -1, 47, 23);
 	MOVE_TEXT_LAYER(weather_layer_7_string_1, 120, 73-20, 200-119-2, 40);
 	MOVE_TEXT_LAYER(weather_layer_7_string_2, 0, 69, 117, 23); //TODO
-	MOVE_TEXT_LAYER(text_TimeZone_layer, 5, 184, 100, 20); //TODO
+	set_text_TimeZone_layer_size();
 #ifndef PBL_PLATFORM_APLITE
 	MOVE_LAYER(bitmap_layer_get_layer(s_health_bmp_layer), 0,185,23,23);
 	MOVE_LAYER(s_layer_health_up_down, 25, 187, 23, 23);
