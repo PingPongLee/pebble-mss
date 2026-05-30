@@ -12,6 +12,14 @@ Modifications copyright (c) 2026
 Also licensed under GPL-3.0.
 
 -----
+Version: 1.1.1
+Published: 5/30/2026
+Release Notes:
+* Fixed various graphic glitches when switching between old themes and custom theme
+
+Notice: There is still an issue with the up/down arrow of sleep/steps. It might be related to a bug in the current new pebble app. I'm testing some things out that I'm done with yet, but decided that since it dosn't work currently, i might as well release this now
+
+-----
 Version: 1.1.0
 Published: 5/16/2026
 Release Notes:
