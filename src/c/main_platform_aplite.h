@@ -1,4 +1,3 @@
-
 #include "pebble.h"
 #include "seven_segment.h"
 #include "config.h"
@@ -179,6 +178,7 @@ static int warning_color_location = 0; //0: no warning, 1: red warning (GPS diff
 
 
 static void set_cwLayer_size(void);
+static void set_text_TimeZone_layer_size(void);
 static void apply_color_profile(void);
 #ifndef PBL_PLATFORM_APLITE
   static void timer_cycle_color_profile_callback(void *data);
@@ -1044,6 +1044,8 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
     } else if (TimeZoneFormat == 2){
       snprintf(buffer_9, sizeof(buffer_9), "%s, %s", hour_mode_str, time_ZONE_NAME);
     }
+		set_text_TimeZone_layer_size();
+		set_cwLayer_size();    
     text_layer_set_text(text_TimeZone_layer, buffer_9);
   }
   
@@ -1632,26 +1634,26 @@ static void apply_color_profile(void){
 
   
 static void set_cwLayer_size(void){
-  #if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT)
+  #if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_EMERY)
     #ifdef COMPILE_WITH_SECONDS
       if (DisplaySeconds){
-        if ((TimeZoneFormat == 1) && (HealthInfo == 0)){
-          text_layer_set_text_alignment(cwLayer, GTextAlignmentCenter);
-          layer_set_frame(text_layer_get_layer(cwLayer), GRect(0+X_OFFSET, 135+Y_OFFSET, 144, 20));
-        } else {
-          text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
-          layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET, 64, 20));
-        }
+        text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
       } else {
         text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-        layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET, 64, 20));
       }
     #endif
-    #ifndef COMPILE_WITH_SECONDS
-      text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-      layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET, 64, 20));
-    #endif
   #endif
+}
+
+static void set_text_TimeZone_layer_size(void) {
+    int x = 1;
+    int y = 132;
+    int h = 20;
+    int w = 78;
+    if (!DisplaySeconds) {
+      w = 105; // up to where second digits sit at x=113
+    }
+    layer_set_frame(text_layer_get_layer(text_TimeZone_layer), GRect(x, y, w, h));
 }
 
 #ifndef PBL_PLATFORM_APLITE
@@ -1917,6 +1919,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
       DisplaySeconds = (int)t->value->int32;
       //APP_LOG(APP_LOG_LEVEL_INFO, "DisplaySeconds = %d", DisplaySeconds);
       set_cwLayer_size();
+      set_text_TimeZone_layer_size();
       layer_mark_dirty(s_image_layer_second_1);
       layer_mark_dirty(s_image_layer_second_2);
       tick_timer_service_unsubscribe();

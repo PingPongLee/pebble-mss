@@ -1,4 +1,3 @@
-
 #include "pebble.h"
 #include "seven_segment.h"
 #include "config.h"
@@ -1142,6 +1141,7 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 			snprintf(buffer_9, sizeof(buffer_9), "%s, %s", hour_mode_str, time_ZONE_NAME);
 		}
 		set_text_TimeZone_layer_size();
+		set_cwLayer_size();
 		text_layer_set_text(text_TimeZone_layer, buffer_9);
 	}
 
@@ -1835,30 +1835,13 @@ static void apply_color_profile(void){
 
 static void set_cwLayer_size(void){
 #if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_EMERY)
-#ifdef COMPILE_WITH_SECONDS
-	if (DisplaySeconds){
-		if ((TimeZoneFormat == 1) && (HealthInfo == 0)){
-			text_layer_set_text_alignment(cwLayer, GTextAlignmentCenter);
-			layer_set_frame(text_layer_get_layer(cwLayer), GRect(0+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 144, 20));
-		} else {
+	#ifdef COMPILE_WITH_SECONDS
+		if (DisplaySeconds){
 			text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
-			#if defined(PBL_PLATFORM_EMERY)
-			#else
-				layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
-			#endif
+		} else {
+			text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
 		}
-	} else {
-		text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-		#if defined(PBL_PLATFORM_EMERY)
-		#else
-			layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
-		#endif
-	}
-#endif
-#ifndef COMPILE_WITH_SECONDS
-	//text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-	//layer_set_frame(text_layer_get_layer(cwLayer), GRect(72+X_OFFSET, 135+Y_OFFSET-obstruction_shift, 64, 20));
-#endif
+	#endif
 #endif
 }
 
@@ -1877,7 +1860,7 @@ static void set_text_TimeZone_layer_size(void) {
 	int x = 1;
 	int y = 132;
 	int h = 20;
-	int w = 70;
+	int w = 78;
 #endif
 	if (!DisplaySeconds) {
 		#if defined(PBL_PLATFORM_CHALK)
