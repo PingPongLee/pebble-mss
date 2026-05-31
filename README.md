@@ -12,7 +12,7 @@ Modifications copyright (c) 2026
 Also licensed under GPL-3.0.
 
 -----
-Version: 1.1.2
+Version: 1.1.3
 Published: 5/31/2026
 Release Notes:
 * Fixed pkjs issue that would crash settings from the settings page to carry over to the watch if using an original Pebble or Pebble Steel
