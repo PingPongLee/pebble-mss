@@ -84,7 +84,7 @@
   layer_add_child(main_window_layer, text_layer_get_layer(Date_Layer));
   
   // Calendar Week
-  cwLayer = text_layer_create(GRect(72, 135, 64, 20)); //64 = label_width = 144-72-2*4 = display_width - display_width/2 - 2*Space
+  cwLayer = text_layer_create(GRect(80, 135, 56, 20)); //64 = label_width = 144-72-2*4 = display_width - display_width/2 - 2*Space
   text_layer_set_text_color(cwLayer, textcolor);
   text_layer_set_background_color(cwLayer, GColorClear );
   text_layer_set_font(cwLayer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
@@ -155,6 +155,8 @@
   text_layer_set_text(text_TimeZone_layer, " ");
   text_layer_set_font(text_TimeZone_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18));
 	layer_add_child(main_window_layer, text_layer_get_layer(text_TimeZone_layer));
+
+	set_text_TimeZone_layer_size();
 
   // Create Health_BMP Layer:
   #ifndef PBL_PLATFORM_APLITE

@@ -748,6 +748,124 @@ function getWeather() {
     console.log("getWeather End");
 }
 
+
+function sanitizeSettingInt(value) {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+    var parsed = parseInt(value, 10);
+    if (isNaN(parsed)) {
+        return undefined;
+    }
+    return parsed;
+}
+
+function buildCoreSettingsDictionary(configuration) {
+    var date_format_str = configuration.date_format;
+    date_format_str = date_format_str.split('_').join('%');
+
+    var dict = {
+        "KEY_SET_INVERT_COLOR": sanitizeSettingInt(configuration.invert),
+        "KEY_SET_LIGHT_ON": sanitizeSettingInt(configuration.light),
+        "KEY_SET_DISPLAY_SEC": sanitizeSettingInt(configuration.display_sec),
+        "KEY_SET_VIBE_DISC": sanitizeSettingInt(configuration.vibe_disconnect),
+        "KEY_SET_COLORED_TMP": sanitizeSettingInt(configuration.colored_temp),
+        "KEY_SET_VIBE_HOUR": sanitizeSettingInt(configuration.vibe_hour),
+        "KEY_SET_DEGREE_F": sanitizeSettingInt(configuration.degree_f),
+        "KEY_SET_DATE_FORMAT": date_format_str,
+        "KEY_WEATHER_UPDATE_INT": sanitizeSettingInt(configuration.weatherUpdateInt),
+        "KEY_SET_TZ_FORMAT": sanitizeSettingInt(configuration.time_zone_info),
+        "KEY_SET_HEALTH": sanitizeSettingInt(configuration.health_info),
+        "KEY_SET_UPDATE_TIME": sanitizeSettingInt(configuration.show_update_time),
+        "KEY_SET_MOON_PHASE": sanitizeSettingInt(configuration.moon_phase)
+    };
+
+    var key;
+    for (key in dict) {
+        if (dict.hasOwnProperty(key) && dict[key] === undefined) {
+            delete dict[key];
+        }
+    }
+    return dict;
+}
+
+function buildColorSettingsDictionary(configuration) {
+    var dict = {
+        "KEY_SET_TOPBARBG_COLOR": sanitizeSettingInt(configuration.topbar_bg),
+        "KEY_SET_TOPBARTXT_COLOR": sanitizeSettingInt(configuration.topbar_txt),
+        "KEY_SET_WEATHERBG_COLOR": sanitizeSettingInt(configuration.weather_bg),
+        "KEY_SET_WEATHERTXT_COLOR": sanitizeSettingInt(configuration.weather_txt),
+        "KEY_SET_DATEBG_COLOR": sanitizeSettingInt(configuration.date_bg),
+        "KEY_SET_DATETXT_COLOR": sanitizeSettingInt(configuration.date_txt),
+        "KEY_SET_CLOCKBG_COLOR": sanitizeSettingInt(configuration.clock_bg),
+        "KEY_SET_CLOCKTXT_COLOR": sanitizeSettingInt(configuration.clock_txt),
+        "KEY_SET_CLOCKALTTXT_COLOR": sanitizeSettingInt(configuration.clock_alt_txt),
+        "KEY_SET_BOTTOMBARBG_COLOR": sanitizeSettingInt(configuration.bottombar_bg),
+        "KEY_SET_BOTTOMBARTXT_COLOR": sanitizeSettingInt(configuration.bottombar_txt),
+        "KEY_SET_SEPERATIONLINES_COLOR": sanitizeSettingInt(configuration.seperation_lines),
+        "KEY_SET_WEATHERICON_COLOR": sanitizeSettingInt(configuration.weather_icon_colors),
+        "KEY_SET_BATTERYICON_COLOR": sanitizeSettingInt(configuration.battery_icon_colors)
+    };
+
+    var key;
+    for (key in dict) {
+        if (dict.hasOwnProperty(key) && dict[key] === undefined) {
+            delete dict[key];
+        }
+    }
+    return dict;
+}
+
+function isApliteWatch() {
+    if (!Pebble.getActiveWatchInfo) {
+        return false;
+    }
+    var info = Pebble.getActiveWatchInfo();
+    return info.platform === 'aplite' ||
+           (info.model && info.model.indexOf('aplite') !== -1);
+}
+
+function sendSettingsToWatch(configuration, onSuccess, onFailure) {
+    var coreSettings = buildCoreSettingsDictionary(configuration);
+    var colorSettings = buildColorSettingsDictionary(configuration);
+    var hasColorSettings = Object.keys(colorSettings).length > 0 && !isApliteWatch();
+
+    console.log("Sending core settings: " + JSON.stringify(coreSettings));
+    Pebble.sendAppMessage(coreSettings,
+        function() {
+            if (!hasColorSettings) {
+                console.log("Settings data transfered successfully.");
+                if (onSuccess) {
+                    onSuccess();
+                }
+                return;
+            }
+
+            console.log("Sending color settings: " + JSON.stringify(colorSettings));
+            Pebble.sendAppMessage(colorSettings,
+                function() {
+                    console.log("Settings data transfered successfully.");
+                    if (onSuccess) {
+                        onSuccess();
+                    }
+                },
+                function(e) {
+                    console.log("Color settings feedback failed: " + JSON.stringify(e));
+                    if (onFailure) {
+                        onFailure(e);
+                    }
+                }
+            );
+        },
+        function(e) {
+            console.log("Core settings feedback failed: " + JSON.stringify(e));
+            if (onFailure) {
+                onFailure(e);
+            }
+        }
+    );
+}
+
 // Listen for when the watchface is opened
 Pebble.addEventListener('ready',
                         function(e) {
@@ -806,77 +924,7 @@ Pebble.addEventListener("webviewclosed",
 
 
                                 //Send to Pebble, persist there
-                                var TopbarBgColor = configuration.topbar_bg;
-                                console.log("DEBUG: topbar_bg    = " + TopbarBgColor);
-                                var TopbarTxtColor = configuration.topbar_txt;
-                                console.log("DEBUG: topbar_txt    = " + TopbarTxtColor);
-                                var WeatherBgColor = configuration.weather_bg;
-                                console.log("DEBUG: weather_bg    = " + WeatherBgColor);
-                                var WeatherTxtColor = configuration.weather_txt;
-                                console.log("DEBUG: weather_txt    = " + WeatherTxtColor);  
-                                var DateBgColor = configuration.date_bg;
-                                console.log("DEBUG: date_bg    = " + DateBgColor);
-                                var DateTxtColor = configuration.date_txt;
-                                console.log("DEBUG: date_txt    = " + DateTxtColor);
-                                var ClockBgColor = configuration.clock_bg;
-                                console.log("DEBUG: clock_bg    = " + ClockBgColor);
-                                var ClockTxtColor = configuration.clock_txt;
-                                console.log("DEBUG: clock_txt    = " + ClockTxtColor);
-                                var ClockAltTxtColor = configuration.clock_alt_txt;
-                                console.log("DEBUG: clock_txt    = " + ClockAltTxtColor);                                
-                                var BottombarBgColor = configuration.bottombar_bg;
-                                console.log("DEBUG: bottombar_bg    = " + BottombarBgColor);
-                                var BottombarTxtColor = configuration.bottombar_txt;
-                                console.log("DEBUG: bottombar_txt    = " + BottombarTxtColor);                                
-                                var SeperationLinesColor = configuration.seperation_lines;
-                                console.log("DEBUG: seperation_lines    = " + SeperationLinesColor);        
-                                var WeatherIconColor = configuration.weather_icon_colors;
-                                console.log("DEBUG: weather_icon_colors    = " + WeatherIconColor);                                                         
-                                var BatteryIconColors = configuration.battery_icon_colors;
-                                console.log("DEBUG: battery_icon_colors    = " + BatteryIconColors);
-
-                                var InvertColors = configuration.invert;
-                                console.log("DEBUG: InvertColors    = " + InvertColors);
-                                var LightOn = configuration.light;
-                                console.log("DEBUG: LightOn         = " + LightOn);
-                                var DisplaySeconds = configuration.display_sec;
-                                console.log("DEBUG: DisplaySeconds  = " + DisplaySeconds);
-
-                                var date_format_str = configuration.date_format; //"%a, %m.%d.%Y";
-                                date_format_str = date_format_str.split('_').join('%');
-                                console.log("DEBUG: date_format     = " + configuration.date_format + "; date_format_str = " + date_format_str);
-
-                                Pebble.sendAppMessage(
-                                    {
-                                        "KEY_SET_TOPBARBG_COLOR": TopbarBgColor,
-                                        "KEY_SET_TOPBARTXT_COLOR": TopbarTxtColor,
-                                        "KEY_SET_WEATHERBG_COLOR": WeatherBgColor,
-                                        "KEY_SET_WEATHERTXT_COLOR": WeatherTxtColor,
-                                        "KEY_SET_DATEBG_COLOR": DateBgColor,
-                                        "KEY_SET_DATETXT_COLOR": DateTxtColor,
-                                        "KEY_SET_CLOCKBG_COLOR": ClockBgColor,
-                                        "KEY_SET_CLOCKTXT_COLOR": ClockTxtColor,
-                                        "KEY_SET_CLOCKALTTXT_COLOR": ClockAltTxtColor,
-                                        "KEY_SET_BOTTOMBARBG_COLOR": BottombarBgColor,
-                                        "KEY_SET_BOTTOMBARTXT_COLOR": BottombarTxtColor,
-                                        "KEY_SET_SEPERATIONLINES_COLOR": SeperationLinesColor,
-                                        "KEY_SET_WEATHERICON_COLOR": WeatherIconColor,
-                                        "KEY_SET_BATTERYICON_COLOR": BatteryIconColors,                                                                                                                     
-
-                                        "KEY_SET_INVERT_COLOR": InvertColors,
-                                        "KEY_SET_LIGHT_ON": LightOn,
-                                        "KEY_SET_DISPLAY_SEC": DisplaySeconds,
-                                        "KEY_SET_VIBE_DISC": configuration.vibe_disconnect,
-                                        "KEY_SET_COLORED_TMP": configuration.colored_temp,
-                                        "KEY_SET_VIBE_HOUR": configuration.vibe_hour,
-                                        "KEY_SET_DEGREE_F": configuration.degree_f,
-                                        "KEY_SET_DATE_FORMAT": date_format_str,
-                                        "KEY_WEATHER_UPDATE_INT": configuration.weatherUpdateInt,
-                                        "KEY_SET_TZ_FORMAT": configuration.time_zone_info,
-                                        "KEY_SET_HEALTH": configuration.health_info,
-                                        "KEY_SET_UPDATE_TIME": configuration.show_update_time,
-                                        "KEY_SET_MOON_PHASE": configuration.moon_phase
-                                    },
+                                sendSettingsToWatch(configuration,
                                     function(e) {
                                         console.log("Settings data transfered successfully.");
                                     },

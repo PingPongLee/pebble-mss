@@ -26,7 +26,7 @@ static void move_layers(void) {
 	MOVE_LAYER(battery_layer, 3, 21, (int)38*battery.charge_percent/100, 11);
 
 	MOVE_TEXT_LAYER(Date_Layer, 5, 63, 134, 30);
-	MOVE_TEXT_LAYER(cwLayer, 72, 135, 64, 20);
+	MOVE_TEXT_LAYER(cwLayer, 80, 135, 56, 20);
 	MOVE_TEXT_LAYER(moonLayer_IMG, 51, NightMode ? 21 : 15, 33, 33);
 
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 50, 10, 94, 30);
