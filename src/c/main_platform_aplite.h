@@ -1584,6 +1584,14 @@ static void apply_color_profile(void){
   background_color_moon = get_weather_icon_bkgr_color(req_WI);
   
   layer_mark_dirty(background_paint_layer);
+  layer_mark_dirty(s_image_layer_hour_1);
+  layer_mark_dirty(s_image_layer_hour_2);
+  layer_mark_dirty(s_image_layer_minute_1);
+  layer_mark_dirty(s_image_layer_minute_2);
+#ifdef COMPILE_WITH_SECONDS
+  layer_mark_dirty(s_image_layer_second_1);
+  layer_mark_dirty(s_image_layer_second_2);
+#endif
   
   text_layer_set_text_color(text_sunrise_layer, textcolor_sun);
   text_layer_set_text_color(text_sunset_layer, textcolor_sun);
@@ -1856,7 +1864,6 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
     case KEY_WARN_LOCATION:
       if (warning_color_location != (int)t->value->int32){
         warning_color_location = (int)t->value->int32;
-        apply_color_profile();
       } 
       break;
     case KEY_WEATHER_TEMP:
@@ -1909,7 +1916,6 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
         if (ColorProfile > 1) ColorProfile = 0;
       #endif
       doUpdateWeather = true; //must be done when a configuration was received //TODO: save this and check on startup to avoid not updating after color scheme selection.
-      apply_color_profile();
       break;
     case KEY_SET_LIGHT_ON:
       LightOn = (int)t->value->int32;
@@ -2017,6 +2023,8 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   
   WeatherUpdateReceived = 1; //this indicates that the weather icon should be displayed if not in night mode.
   
+  apply_color_profile();
+
   if (Settings_received){
     handle_second_tick(tick_time, SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT);
     #if defined(PBL_HEALTH)

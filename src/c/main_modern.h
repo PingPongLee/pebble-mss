@@ -68,8 +68,10 @@ static EffectLayer *s_battery_layer_fill; //fill battery with an InverterLayer b
 
 #ifndef PBL_PLATFORM_APLITE
 static BitmapLayer *s_health_bmp_layer;
+static BitmapLayer *s_cw_bmp_layer;
 static GBitmap *s_health_bitmap_sleep;
 static GBitmap *s_health_bitmap_steps;
+static GBitmap *s_health_bitmap_heart;
 static TextLayer *text_layer_health; //Steps/Sleep
 static Layer *s_layer_health_up_down;
 #endif
@@ -157,6 +159,11 @@ static int vibe_on_disconnect = VIBE_ON_DISC;
 static int vibe_on_hour         = VIBE_ON_HOUR;
 static int degree_f = DEGREE_F;
 static char date_format[20] = DATE_FORMAT;
+#define RIGHT_SIDE_HIDDEN     0
+#define RIGHT_SIDE_CALENDAR   1
+#define RIGHT_SIDE_HEART_RATE 2
+static int RightSideBelowClock = RIGHT_SIDE_CALENDAR;
+
 static int WeatherUpdateInterval = WEATHER_UPDATE_INTERVAL_MINUTE;
 static int ShowTimeSinceStationData = 0;
 static int TimeZoneFormat = 0;
@@ -199,7 +206,10 @@ static int health_higher_lower_than_avg = 0; //0: equal, -1: lower that avg, 1: 
 
 static int get_hex_from_picker_int(int);
 static void set_cwLayer_size(void);
+static void set_cw_layer_layout(bool heart_rate_mode);
+static void update_cw_layer(void);
 static void set_text_TimeZone_layer_size(void);
+static void set_date_layer_font(void);
 static void apply_color_profile(void);
 #ifndef PBL_PLATFORM_APLITE
 static void update_health_icon_colors(GColor color);
@@ -288,6 +298,36 @@ void replace_degree(char *s, int size_s){
 			s[i]   = (char)176;
 		}
 	}
+}
+
+static const char *get_calendar_week_strftime_format(void) {
+	if (strcmp("fr_FR", sys_locale) == 0) {
+		return TRANSLATION_CW_FR;
+	}
+	if (strcmp("de_DE", sys_locale) == 0) {
+		return TRANSLATION_CW_DE;
+	}
+	return TRANSLATION_CW_EN;
+}
+
+static void build_date_format_with_cw_prefix(const char *format, char *out, size_t out_size) {
+	const char *cw_format = get_calendar_week_strftime_format();
+	size_t out_len = 0;
+
+	while (*format && out_len + 1 < out_size) {
+		if (format[0] == '%' && format[1] == 'V') {
+			size_t cw_len = strlen(cw_format);
+			if (out_len + cw_len >= out_size) {
+				break;
+			}
+			memcpy(out + out_len, cw_format, cw_len);
+			out_len += cw_len;
+			format += 2;
+		} else {
+			out[out_len++] = *format++;
+		}
+	}
+	out[out_len] = '\0';
 }
 
 
@@ -425,6 +465,9 @@ void LoadData(void) {
 	key = KEY_SET_DATE_FORMAT;
 	if (persist_exists(key)) persist_read_string(key, date_format, sizeof(date_format));
 
+	key = KEY_SET_RIGHT_SIDE;
+	if (persist_exists(key)) RightSideBelowClock = persist_read_int(key);
+
 	key = KEY_WARN_LOCATION;
 	if (persist_exists(key)) warning_color_location = persist_read_int(key);
 
@@ -499,8 +542,8 @@ void SaveData(void) {
 	persist_write_int(KEY_SET_TZ_FORMAT, TimeZoneFormat);
 	persist_write_int(KEY_SET_HEALTH, HealthInfo);
 	persist_write_string(KEY_SET_DATE_FORMAT, date_format);
+	persist_write_int(KEY_SET_RIGHT_SIDE, RightSideBelowClock);
 	persist_write_int(KEY_SET_UPDATE_TIME, ShowTimeSinceStationData);
-
 	persist_write_int(KEY_WARN_LOCATION, warning_color_location);
 
 	persist_write_int(KEY_SET_DEGREE_F, degree_f);
@@ -1022,9 +1065,17 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 
 
 
-	static char date_buffer[20];
+	static char date_buffer[32];
 	if (units_changed & HOUR_UNIT) {
-		strftime(date_buffer, sizeof(date_buffer), /*"%a, %d.%m."*/date_format, &current_time_copy);
+		static char effective_date_format[32];
+		const char *format_to_use = date_format;
+
+		set_date_layer_font();
+		if (strstr(date_format, "%V") != NULL) {
+			build_date_format_with_cw_prefix(date_format, effective_date_format, sizeof(effective_date_format));
+			format_to_use = effective_date_format;
+		}
+		strftime(date_buffer, sizeof(date_buffer), format_to_use, &current_time_copy);
 		text_layer_set_text(Date_Layer, date_buffer);
 	}
 
@@ -1109,18 +1160,8 @@ static void handle_second_tick(struct tm* current_time, TimeUnits units_changed)
 	NightModeOld = NightMode;
 
 
-	if (units_changed & HOUR_UNIT){
-		// -------------------- Calendar week  
-		static char cw_text[] = "XX00";
-		if (strcmp("fr_FR", sys_locale) == 0) {
-			strftime(cw_text, sizeof(cw_text), TRANSLATION_CW_FR, &current_time_copy);
-		} else if (strcmp("de_DE", sys_locale) == 0) {
-			strftime(cw_text, sizeof(cw_text), TRANSLATION_CW_DE, &current_time_copy);
-		} else { //default
-			strftime(cw_text, sizeof(cw_text), TRANSLATION_CW_EN, &current_time_copy);
-		}
-		text_layer_set_text(cwLayer, cw_text); 
-		// ------------------- Calendar week 
+	if (units_changed & HOUR_UNIT) {
+		update_cw_layer();
 	}
 
 
@@ -1743,6 +1784,7 @@ static void layer_update_callback_background(Layer *layer, GContext* ctx){
 #ifndef PBL_PLATFORM_APLITE
 static void update_health_icon_colors(GColor color) {
 	health_bitmap_set_icon_color(s_health_bitmap_steps, color);
+	health_bitmap_set_icon_color(s_health_bitmap_heart, color);
 	health_bitmap_set_icon_color(s_health_bitmap_sleep, color);
 	if (s_health_bmp_layer) {
 		layer_mark_dirty(bitmap_layer_get_layer(s_health_bmp_layer));
@@ -1782,6 +1824,14 @@ static void apply_color_profile(void){
 	background_color_moon = get_weather_icon_bkgr_color(req_WI);
 
 	layer_mark_dirty(background_paint_layer);
+	layer_mark_dirty(s_image_layer_hour_1);
+	layer_mark_dirty(s_image_layer_hour_2);
+	layer_mark_dirty(s_image_layer_minute_1);
+	layer_mark_dirty(s_image_layer_minute_2);
+#ifdef COMPILE_WITH_SECONDS
+	layer_mark_dirty(s_image_layer_second_1);
+	layer_mark_dirty(s_image_layer_second_2);
+#endif
 
 	text_layer_set_text_color(text_sunrise_layer, textcolor_sun);
 	text_layer_set_text_color(text_sunset_layer, textcolor_sun);
@@ -1789,6 +1839,12 @@ static void apply_color_profile(void){
 	text_layer_set_text_color(battery_runtime_layer, textcolor_bat);
 	text_layer_set_text_color(Date_Layer, textcolor_date);
 	text_layer_set_text_color(cwLayer, textcolor_cal);
+#ifndef PBL_PLATFORM_APLITE
+	if (s_cw_bmp_layer && RightSideBelowClock == RIGHT_SIDE_HEART_RATE) {
+		health_bitmap_set_icon_color(s_health_bitmap_heart, textcolor_cal);
+		layer_mark_dirty(bitmap_layer_get_layer(s_cw_bmp_layer));
+	}
+#endif
 	text_layer_set_text_color(moonLayer_IMG, textcolor_moon);
 	text_layer_set_text_color(weather_layer_1_temp, textcolor_weather);
 	text_layer_set_text_color(weather_layer_3_location, textcolor_location);
@@ -1832,18 +1888,88 @@ static void apply_color_profile(void){
 #endif
 }
 
+static void set_date_layer_font(void) {
+	#if defined(PBL_PLATFORM_EMERY)
+		text_layer_set_font(Date_Layer, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
+		layer_set_frame(text_layer_get_layer(Date_Layer), GRect(1, 89 - obstruction_shift, 198, 31));
+	#elif defined(PBL_PLATFORM_CHALK)
+		text_layer_set_font(Date_Layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
+		layer_set_frame(text_layer_get_layer(Date_Layer), GRect(20, 63 + Y_OFFSET - obstruction_shift, 180 - 20 - 25, 30));
+	#endif
+}
 
 static void set_cwLayer_size(void){
-#if defined(PBL_PLATFORM_APLITE) || defined(PBL_PLATFORM_BASALT) || defined(PBL_PLATFORM_EMERY)
-	#ifdef COMPILE_WITH_SECONDS
-		if (DisplaySeconds){
-			text_layer_set_text_alignment(cwLayer, GTextAlignmentLeft);
-		} else {
-			text_layer_set_text_alignment(cwLayer, GTextAlignmentRight); // this must be done before layer_set_frame for alignment on Aplite.
-		}
-	#endif
+#ifndef PBL_PLATFORM_APLITE
+	set_cw_layer_layout(RightSideBelowClock == RIGHT_SIDE_HEART_RATE);
 #endif
 }
+
+#if defined(PBL_HEALTH)
+static void update_cw_layer_heart_rate(void) {
+	static char s_hrm_buffer[8];
+	HealthServiceAccessibilityMask hr = health_service_metric_accessible(
+		HealthMetricHeartRateBPM, time(NULL), time(NULL));
+
+	if (hr & HealthServiceAccessibilityMaskAvailable) {
+		HealthValue val = health_service_peek_current_value(HealthMetricHeartRateBPM);
+		if (val > 0) {
+			snprintf(s_hrm_buffer, sizeof(s_hrm_buffer), "%lu", (uint32_t)val);
+			text_layer_set_text(cwLayer, s_hrm_buffer);
+			bitmap_layer_set_bitmap(s_cw_bmp_layer, s_health_bitmap_heart);
+			return;
+		}
+	}
+	text_layer_set_text(cwLayer, s_hrm_buffer[0] ? s_hrm_buffer : "--");
+	//text_layer_set_text(cwLayer, "172");
+	bitmap_layer_set_bitmap(s_cw_bmp_layer, s_health_bitmap_heart);
+}
+#endif
+
+static void update_cw_layer_calendar(struct tm *current_time) {
+	static char cw_text[] = "XX00";
+	strftime(cw_text, sizeof(cw_text), get_calendar_week_strftime_format(), current_time);
+	text_layer_set_text(cwLayer, cw_text);
+}
+
+static void update_cw_layer(void) {
+	bool show_text = false;
+	bool show_icon = false;
+	bool heart_rate_mode = false;
+
+	if (RightSideBelowClock == RIGHT_SIDE_HIDDEN) {
+		// hidden
+	} else if (RightSideBelowClock == RIGHT_SIDE_HEART_RATE) {
+#if defined(PBL_HEALTH)
+		show_text = true;
+		show_icon = true;
+		heart_rate_mode = true;
+#endif
+	} else if (RightSideBelowClock == RIGHT_SIDE_CALENDAR) {
+		show_text = true;
+	}
+
+	set_cw_layer_layout(heart_rate_mode);
+	layer_set_hidden(text_layer_get_layer(cwLayer), !show_text);
+	if (s_cw_bmp_layer) {
+		layer_set_hidden(bitmap_layer_get_layer(s_cw_bmp_layer), !show_icon);
+	}
+
+	if (!show_text) {
+		return;
+	}
+
+	if (RightSideBelowClock == RIGHT_SIDE_HEART_RATE) {
+#if defined(PBL_HEALTH)
+		update_cw_layer_heart_rate();
+		health_bitmap_set_icon_color(s_health_bitmap_heart, textcolor_cal);
+#endif
+	} else if (RightSideBelowClock == RIGHT_SIDE_CALENDAR) {
+		time_t now = time(NULL);
+		struct tm *current_time = localtime(&now);
+		update_cw_layer_calendar(current_time);
+	}
+}
+
 
 static void set_text_TimeZone_layer_size(void) {
 #if defined(PBL_PLATFORM_CHALK)
@@ -1985,18 +2111,9 @@ static void health_handler(HealthEventType event, void *context) {
 			do_update = 3;
 			break;
 		case HealthEventHeartRateUpdate:
-			//do_update = -1; //TODO
-//      HealthServiceAccessibilityMask hr = health_service_metric_accessible(HealthMetricHeartRateBPM, time(NULL), time(NULL));
-//      if (hr & HealthServiceAccessibilityMaskAvailable) {
-//        HealthValue val = health_service_peek_current_value(HealthMetricHeartRateBPM);
-//        if(val > 0) {
-//          // Display HRM value
-//          static char s_hrm_buffer[8];
-//          snprintf(s_hrm_buffer, sizeof(s_hrm_buffer), "%lu BPM", (uint32_t)val);
-//          text_layer_set_text(s_hrm_layer, s_hrm_buffer);
-//        }
-//      }
-//      return; //TODO: test if this can work
+			if (RightSideBelowClock == RIGHT_SIDE_HEART_RATE) {
+				update_cw_layer();
+			}
 			break;
 		case HealthEventMetricAlert:
 			//do_update = -1; //TODO
@@ -2035,12 +2152,16 @@ static void health_handler(HealthEventType event, void *context) {
 		if (mask & HealthServiceAccessibilityMaskAvailable) {
 			// Data is available!
 			HealthValue today = health_service_sum_today(metric);
+			//today = 10342;
 			HealthValue average = (HealthValue)0;
 			if (mask_avg & HealthServiceAccessibilityMaskAvailable) {
 				// Average is available, read it
 				average = health_service_sum_averaged(metric, start, end, scope);
 			}
 
+			// sleep testing. Uncomment line above "do_update = 3;" to test.
+			//APP_LOG(APP_LOG_LEVEL_INFO, ">>>>>> today = %d", (int)today);
+			//today = 7820; // 10 hours 30 minutes
 			if (do_update == 3){
 				print_time(sleep_str, sizeof(sleep_str), (time_t)today, 0);
 				snprintf(steps_str, sizeof(steps_str), "%s%s", sleep_str, unit);
@@ -2095,9 +2216,9 @@ static void layer_update_callback_health_up_down(Layer *layer, GContext* ctx){
 		int multiplier = 10;
 		int pos = 10;
 	#endif
-
+//APP_LOG(APP_LOG_LEVEL_INFO, ">>>>>> health_higher_lower_than_avg");
 	#if defined(PBL_PLATFORM_EMERY)
-		layer_set_frame(text_layer_get_layer(text_layer_health), GRect(25+23, 180, 90, 30)); // Todo: fix hardcode and use vals from inc_main_load_x.h
+		layer_set_frame(text_layer_get_layer(text_layer_health), GRect(21+23, 179, 90, 30)); // Todo: fix hardcode and use vals from inc_main_load_x.h
 	#else
 		layer_set_frame(text_layer_get_layer(text_layer_health), GRect(14+12, 132, 100, 20)); // Todo: fix hardcode and use vals from inc_main_load_x.h
 	#endif		
@@ -2161,6 +2282,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 	tick_time = localtime(&now);
 
 	bool Settings_received = false;
+	bool color_settings_received = false;
 
 	// For all items
 	while(t != NULL) {
@@ -2185,8 +2307,7 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 			case KEY_WARN_LOCATION:
 				if (warning_color_location != (int)t->value->int32){
 					warning_color_location = (int)t->value->int32;
-					apply_color_profile();
-				} 
+				}
 				break;
 			case KEY_WEATHER_TEMP:
 #ifndef ITERATE_TEMP
@@ -2228,46 +2349,60 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
 			case KEY_SET_TOPBARBG_COLOR:
 				TopbarBgColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_TOPBARTXT_COLOR:
 				TopbarTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;	
 			case KEY_SET_WEATHERBG_COLOR:
 				WeatherBgColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_WEATHERTXT_COLOR:
 				WeatherTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;	
 			case KEY_SET_DATEBG_COLOR:
 				DateBgColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_DATETXT_COLOR:
 				DateTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;
 			case KEY_SET_CLOCKBG_COLOR:
 				ClockBgColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_CLOCKTXT_COLOR:
 				ClockTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;	
 			case KEY_SET_CLOCKALTTXT_COLOR:
 				ClockAltTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;					
 			case KEY_SET_BOTTOMBARBG_COLOR:
 				BottombarBgColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_BOTTOMBARTXT_COLOR:
 				BottombarTxtColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;	
 				
 			case KEY_SET_SEPERATIONLINES_COLOR:
 				SeperationLinesColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_WEATHERICON_COLOR:
 				WeatherIconColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;		
 			case KEY_SET_BATTERYICON_COLOR:
 				BatteryIconColor = (int)t->value->int32;
+				color_settings_received = true;
 				break;																			
 				
 			case KEY_SET_INVERT_COLOR:
@@ -2283,7 +2418,6 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 				if (ColorProfile > 1) ColorProfile = 0;
 #endif
 				doUpdateWeather = true; //must be done when a configuration was received //TODO: save this and check on startup to avoid not updating after color scheme selection.
-				apply_color_profile();
 				break;
 			case KEY_SET_LIGHT_ON:
 				LightOn = (int)t->value->int32;
@@ -2341,7 +2475,12 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
 			case KEY_SET_DATE_FORMAT:
 				snprintf(date_format, sizeof(date_format), "%s", t->value->cstring);
-				//APP_LOG(APP_LOG_LEVEL_ERROR, "date_format in watchface = %s", date_format);
+				//APP_LOG(APP_LOG_LEVEL_ERROR, "date_format in watchface = %s, from inbox = %s", date_format, t->value->cstring);
+				Settings_received = true;
+				break;
+
+			case KEY_SET_RIGHT_SIDE:
+				RightSideBelowClock = (int)t->value->int32;
 				Settings_received = true;
 				break;
 
@@ -2391,15 +2530,17 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 
 	WeatherUpdateReceived = 1; //this indicates that the weather icon should be displayed if not in night mode.
 
-	if (Settings_received){
+	apply_color_profile();
+
+	if (Settings_received || color_settings_received){
 		handle_second_tick(tick_time, SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT);
 #if defined(PBL_HEALTH)
-		health_handler(HealthEventSignificantUpdate, NULL);
+		if (Settings_received) {
+			health_handler(HealthEventSignificantUpdate, NULL);
+		}
 #endif
 	}
 	if (restart) window_stack_pop_all(true); //true means animated = slide out
-
-	DisplayData();
 }
 
 #ifndef PBL_PLATFORM_APLITE
@@ -2490,6 +2631,7 @@ static void main_window_load(Window *window) {
 #ifndef PBL_PLATFORM_APLITE
 	s_health_bitmap_sleep = health_bitmap_load(RESOURCE_ID_IMAGE_HEALTH_SLEEP);
 	s_health_bitmap_steps = health_bitmap_load(RESOURCE_ID_IMAGE_HEALTH_STEPS);
+	s_health_bitmap_heart = health_bitmap_load(RESOURCE_ID_IMAGE_HEALTH_HEART);
 #endif
 
 #ifdef PBL_PLATFORM_APLITE
@@ -2510,6 +2652,9 @@ static void main_window_load(Window *window) {
 	handle_second_tick(tick_time, SECOND_UNIT | MINUTE_UNIT | HOUR_UNIT);
 	handle_battery(battery_state_service_peek());
 	handle_bluetooth(bluetooth_connection_service_peek());
+#ifndef PBL_PLATFORM_APLITE
+	update_cw_layer();
+#endif
 
 #ifndef PBL_PLATFORM_APLITE
 	if (cycle_color_profile){
@@ -2539,7 +2684,7 @@ static void main_window_load(Window *window) {
 #if defined(PBL_HEALTH)
 	// Attempt to subscribe 
 	if(!health_service_events_subscribe(health_handler, NULL)) {
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
+		//APP_LOG(APP_LOG_LEVEL_ERROR, "Health not available!");
 	} else {
 		health_handler(HealthEventSignificantUpdate, NULL);
 	}
@@ -2612,8 +2757,10 @@ static void main_window_unload(Window *window) {
 
 #ifndef PBL_PLATFORM_APLITE
 	bitmap_layer_destroy(s_health_bmp_layer);
+	bitmap_layer_destroy(s_cw_bmp_layer);
 	gbitmap_destroy(s_health_bitmap_sleep);
 	gbitmap_destroy(s_health_bitmap_steps);
+	gbitmap_destroy(s_health_bitmap_heart);
 #endif
 
 

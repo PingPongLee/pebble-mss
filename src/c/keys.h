@@ -26,6 +26,7 @@
 #define KEY_SET_COLORED_TMP    24
 #define KEY_SET_DEGREE_F       25
 #define KEY_SET_DATE_FORMAT    26
+#define KEY_SET_RIGHT_SIDE     39
 #define KEY_SET_TZ_FORMAT      27
 #define KEY_SET_VIBE_HOUR      28
 #define KEY_SET_UPDATE_TIME    29

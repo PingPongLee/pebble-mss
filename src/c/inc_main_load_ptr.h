@@ -1,6 +1,24 @@
 #define MOVE_LAYER(layer, x, y, w, h) layer_set_frame(layer, GRect(x, (y)-obstruction_shift, w, h))
 #define MOVE_TEXT_LAYER(layer, x, y, w, h) MOVE_LAYER(text_layer_get_layer(layer), x, y, w, h)
 
+static void set_cw_layer_layout(bool heart_rate_mode) {
+	int placement_buffer = 0;
+	int icon_y = 137 + Y_OFFSET, icon_h = 14, icon_w = 15, icon_x = 180 - 64 - 35 + 64 - 15;
+	int y = 135 + Y_OFFSET, h = 20, w = 64, x = 180 - 64 - 35;
+
+	if (!heart_rate_mode) {
+		placement_buffer += icon_w;
+	}
+
+	x += placement_buffer;
+	icon_x += placement_buffer;
+
+	layer_set_frame(text_layer_get_layer(cwLayer), GRect(x, y - obstruction_shift, w, h));
+	if (heart_rate_mode && s_cw_bmp_layer) {
+		layer_set_frame(bitmap_layer_get_layer(s_cw_bmp_layer), GRect(icon_x, icon_y - obstruction_shift, icon_w, icon_h));
+	}
+}
+
 static void move_layers(void) {
 	MOVE_LAYER(background_paint_layer, 0, 0, 180, 180);
 	MOVE_LAYER(s_image_layer_hour_1, 4+X_OFFSET-5, 94+Y_OFFSET, 26, 41);
@@ -24,7 +42,7 @@ static void move_layers(void) {
 
 	// Date text
 	MOVE_TEXT_LAYER(Date_Layer, 20, 63+Y_OFFSET, 180-20-25 /* width */, 30 /* height */);
-	MOVE_TEXT_LAYER(cwLayer, 180-64-35, 135+Y_OFFSET, 64, 20); //64 = label_width = 144-72-2*4 = display_width - display_width/2 - 2*Space
+	set_cwLayer_size();
 	MOVE_TEXT_LAYER(moonLayer_IMG, 51+X_OFFSET, 18+Y_OFFSET, 33, 33);
 	MOVE_TEXT_LAYER(weather_layer_1_temp, 87+X_OFFSET, 10+Y_OFFSET, 180-87-X_OFFSET, 30);
 	MOVE_TEXT_LAYER(weather_layer_3_location, 0, -1+Y_OFFSET, 180, 17);
@@ -132,7 +150,7 @@ static void create_layers(void) {
 	text_layer_set_font(cwLayer, fonts_get_system_font(FONT_KEY_GOTHIC_14));
 	text_layer_set_text_alignment(cwLayer, GTextAlignmentRight);
 	layer_add_child(main_window_layer, text_layer_get_layer(cwLayer));
-	//set_cwLayer_size();
+	set_cwLayer_size();
 
 	// Moon phase
 	moonLayer_IMG = text_layer_create(GRectZero);
@@ -203,6 +221,13 @@ static void create_layers(void) {
 	s_health_bmp_layer = bitmap_layer_create(GRectZero); //0,137,15,14
 	bitmap_layer_set_alignment(s_health_bmp_layer, GAlignBottomLeft);
 	layer_add_child(main_window_layer, bitmap_layer_get_layer(s_health_bmp_layer));
+
+	s_cw_bmp_layer = bitmap_layer_create(GRectZero);
+	bitmap_layer_set_alignment(s_cw_bmp_layer, GAlignBottomLeft);
+	bitmap_layer_set_background_color(s_cw_bmp_layer, GColorClear);
+	bitmap_layer_set_compositing_mode(s_cw_bmp_layer, GCompOpSet);
+	layer_set_hidden(bitmap_layer_get_layer(s_cw_bmp_layer), true);
+	layer_add_child(main_window_layer, bitmap_layer_get_layer(s_cw_bmp_layer));
 
 	text_layer_health = text_layer_create(GRectZero); //14+10, 132, 100, 20
 	text_layer_set_background_color(text_layer_health, GColorClear);

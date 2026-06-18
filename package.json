@@ -38,6 +38,7 @@
             "KEY_SET_COLORED_TMP": 24,
             "KEY_SET_INVERT_COLOR": 20,
             "KEY_SET_DATE_FORMAT": 26,
+            "KEY_SET_RIGHT_SIDE": 39,
             "KEY_SET_DEGREE_F": 25,
             "KEY_SET_DISPLAY_SEC": 21,
             "KEY_SET_HEALTH": 30,
@@ -107,7 +108,7 @@
                         "emery"
                     ],
                     "type": "bitmap"
-                },
+                },              
                 {
                     "file": "images/sleep_sm2.png",
                     "memoryFormat": "SmallestPalette",
@@ -127,7 +128,27 @@
                         "emery"
                     ],
                     "type": "bitmap"
+                },
+                {
+                    "file": "images/heart_sm.png",
+                    "memoryFormat": "SmallestPalette",
+                    "name": "IMAGE_HEALTH_HEART",
+                    "targetPlatforms": [
+                        "basalt",
+                        "chalk",
+                        "diorite"
+                    ],
+                    "type": "bitmap"
                 },                
+                {
+                    "file": "images/heart.png",
+                    "memoryFormat": "SmallestPalette",
+                    "name": "IMAGE_HEALTH_HEART",
+                    "targetPlatforms": [
+                        "emery"
+                    ],
+                    "type": "bitmap"
+                },                  
                 {
                     "file": "fonts/moon_phases.ttf",
                     "name": "FONT_MOON_PHASES_SUBSET_30",
