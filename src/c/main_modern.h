@@ -2111,6 +2111,7 @@ static void health_handler(HealthEventType event, void *context) {
 			do_update = 3;
 			break;
 		case HealthEventHeartRateUpdate:
+		case HealthEventHRVUpdate:
 			if (RightSideBelowClock == RIGHT_SIDE_HEART_RATE) {
 				update_cw_layer();
 			}

@@ -76,6 +76,13 @@ int moonphase_char_number(int moonphase_number)
   {
     char_number = moonphase_number + 95;
   }
+
+  // '1' is not in moon_phases.ttf, so the fallback font draws a digit.
+  // '@' is the new-moon outline already in the font.
+  if (char_number == '1')
+  {
+    char_number = '@';
+  }
   
   return char_number;
 }
