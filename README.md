@@ -12,6 +12,12 @@ Modifications copyright (c) 2026
 Also licensed under GPL-3.0.
 
 -----
+Version: 1.2.1
+Published: 11/10/2026
+Release Notes:
+* Fixed crash which prevented users from using the watchface at all. Related to new moon handling, a new health event type, and a recent Pebble App update
+
+-----
 Version: 1.2.0
 Published: 6/24/2026
 Release Notes:
