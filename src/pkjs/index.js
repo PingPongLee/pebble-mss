@@ -846,7 +846,9 @@ function buildCoreSettingsDictionary(configuration) {
         "KEY_SET_TZ_FORMAT": sanitizeSettingInt(configuration.time_zone_info),
         "KEY_SET_HEALTH": sanitizeSettingInt(configuration.health_info),
         "KEY_SET_UPDATE_TIME": sanitizeSettingInt(configuration.show_update_time),
-        "KEY_SET_MOON_PHASE": sanitizeSettingInt(configuration.moon_phase)
+        "KEY_SET_MOON_PHASE": sanitizeSettingInt(configuration.moon_phase),
+        "KEY_SET_BTY_LOW_THRESH": sanitizeSettingInt(configuration.bat_low_threshold),
+        "KEY_SET_BTY_CRIT_THRESH": sanitizeSettingInt(configuration.bat_crit_threshold)
     };
 
     var key;

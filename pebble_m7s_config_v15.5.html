@@ -63,7 +63,7 @@
       <option value="2">Time since last update of OWM data of the server</option>
     </select>
     </p>
-    
+
     <p> Moon Phase: <font color=”#FF0000”>[7]</font>:
     <br>
     <select id="show_moon_select" size="3">
@@ -292,6 +292,18 @@
       <option value="4">Always show sleep</option>
     </select>
     </p>
+
+    <p> Battery Low Percentage Threshold (0-100)  <font color=”#FF0000”>[8]</font>:
+      <br>
+      <input id="bat_low_threshold" type="number" min="0" max="100" value="20"/>
+    </p>
+
+    <p> Battery Critical Percentage Threshold (0-100)  <font color=”#FF0000”>[8]</font>:
+      <br>
+      (has no effect on non-colored displays)
+      <br>
+      <input id="bat_crit_threshold" type="number" min="0" max="100" value="10"/>
+    </p>
     
     <p>Vibrate on Buetooth <br>disconnect (longer 3 pulses) and <br>connect (2x short-long, 4 pulses):
     <br>
@@ -367,6 +379,9 @@
 	  
 	  var vdSelect = document.getElementById("vibe_dis_select");
 	  var vhSelect = document.getElementById("vibe_hour_select");
+
+      var batLowThreshold = document.getElementById("bat_low_threshold");
+      var batCritThreshold = document.getElementById("bat_crit_threshold");
 	  
 	  var tuSelect = document.getElementById("temp_unit_select");
 	  var suSelect = document.getElementById("speed_unit_select");
@@ -405,6 +420,9 @@
           "health_info": healthSelect.selectedIndex,
           "vibe_disconnect": vdSelect.selectedIndex,
           "vibe_hour": vhSelect.selectedIndex,
+
+          "bat_low_threshold": batLowThreshold.value,
+          "bat_crit_threshold": batCritThreshold.value,
           
           "default_loc": defaultlocEdit.value,
           "autodetect_loc": autodetlocSelect.selectedIndex,
@@ -566,7 +584,15 @@
   		      moonSelect.selectedIndex = init_options.moon_phase;
 			  console.log('moonSelect set to '+init_options.moon_phase);
 		    }
-		    
+
+            if (init_options.bat_low_threshold !== "undefined"){
+              batLowThreshold.value = init_options.bat_low_threshold;
+              console.log('batLowThreshold set to '+init_options.bat_low_threshold);
+            }
+            if (init_options.bat_crit_threshold !== "undefined"){
+              batCritThreshold.value = init_options.bat_crit_threshold;
+              console.log('batCritThreshold set to '+init_options.bat_crit_threshold);
+            }
 		    
 		    if (init_options.weatherLine1 !== "undefined"){
   		      weatherLine1Select.selectedIndex = init_options.weatherLine1;

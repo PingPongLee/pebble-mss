@@ -54,6 +54,8 @@ static TextLayer *weather_layer_7_string_2; //configurable, under moon and batte
 
 static TextLayer *text_TimeZone_layer; //24H/AM/PM and UTC-Offset
 
+static int battery_low_threshold = 20;
+static int battery_critical_threshold = 10;
 static int last_battery_percent = 0;
 static int battery_percent_on_exit = 0;
 static time_t last_battery_charged_time = 0; //absolute time of last event
@@ -384,6 +386,10 @@ void LoadData(void) {
 	key = KEY_BTY_LAST_PERIOD;
 	if (persist_exists(key)) last_battery_period_time = (time_t)(persist_read_int(key));
 
+    key = KEY_SET_BTY_LOW_THRESH;
+    if (persist_exists(key)) battery_low_threshold = persist_read_int(key);
+    key = KEY_SET_BTY_CRIT_THRESH;
+    if (persist_exists(key)) battery_critical_threshold = persist_read_int(key);
 
 	init_battery_handler = 1;
 
@@ -502,6 +508,9 @@ void SaveData(void) {
 	BatteryChargeState actual_charge = battery_state_service_peek();
 	persist_write_int    (KEY_BTY_PERCENT_EXIT,  actual_charge.charge_percent);
 	persist_write_int    (KEY_BTY_LAST_CHARGED,  (int)(last_battery_charged_time));
+
+    persist_write_int    (KEY_SET_BTY_LOW_THRESH, battery_low_threshold);
+    persist_write_int    (KEY_SET_BTY_CRIT_THRESH, battery_critical_threshold);
 
 	persist_write_int    (KEY_BTY_LAST_STATE,  last_charge_state);
 	persist_write_int    (KEY_BTY_LAST_PERIOD,  (int)(last_battery_period_time));
@@ -1258,7 +1267,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 	//charge_state_int = 2: plugged and full
 
 	static BatteryChargeState old_charge_state;
-	int old_charge_state_int = 0; //not stitic, is calculated from old_charge_state
+	int old_charge_state_int = 0; //not static, is calculated from old_charge_state
 
 
 
@@ -1329,7 +1338,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 	//GRect(41, 21, 38, 11): size of InverterLayer
 	layer_set_frame(inverter_layer_get_layer(s_battery_layer_fill), GRect(3, 21-obstruction_shift, (int)38*actual_battery_percent/100, 11));
 	layer_set_hidden(inverter_layer_get_layer(s_battery_layer_fill), false);
-	if (actual_battery_percent <= 20){
+	if (actual_battery_percent <= battery_low_threshold){
 		if (!ColorProfile){
 			textcolor_bat = GColorBlack;
 			bkgrcolor_bat = GColorWhite;
@@ -1357,14 +1366,6 @@ static void handle_battery(BatteryChargeState charge_state) {
 	layer_set_hidden(effect_layer_get_layer(s_battery_layer_fill), false);
 	uint8_t variable_color = 0;
 
-	#ifdef PBL_PLATFORM_CHALK
-		int normal = 30;
-		int low = 20;		
-	#else
-		int normal = 20;
-		int low = 10;
-	#endif
-
 	uint8_t fine = 0b11000100; // dark green
 	uint8_t warning = 0b11110100; // dark orange (GColorOrange)
 	uint8_t critical = 0b11110000; // red (GColorRed)
@@ -1378,9 +1379,9 @@ static void handle_battery(BatteryChargeState charge_state) {
 		} /* BatteryIconColor==2 - We dont need to do anything here since that is the default so above values fit */
 	}
 
-	if (actual_battery_percent > normal){ //40-100% for chalk, 30-100% for others
+	if (actual_battery_percent > battery_low_threshold){ // 21%-100% by default
 		variable_color = fine;	          
-	} else if (actual_battery_percent > low){ //30% for chalk, 20% for others
+	} else if (actual_battery_percent > battery_critical_threshold){ // 11%-20% by default
 		variable_color = warning;	
 	} else {
 		variable_color = critical;			
@@ -1402,7 +1403,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 			bkgrcolor_bat_uint8 = variable_color;
 		}
 		//On all Profiles, make battery white on red if <= 20%:
-		if (actual_battery_percent <= 20){
+		if (actual_battery_percent <= battery_low_threshold){
 			if(ColorProfile==16 && BatteryIconColor == 0) {
 				textcolor_bat_uint8 = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor)).argb;
 			} else {
@@ -1412,8 +1413,8 @@ static void handle_battery(BatteryChargeState charge_state) {
 		}
 
 	#ifdef PBL_PLATFORM_DIORITE
-		//On all Profiles (except 0 and 1), make battery white on red if <= 20%:
-		if (actual_battery_percent <= 20){
+        //On all Profiles (except 0 and 1), make battery white on red if <= battery_low_threshold:
+		if (actual_battery_percent <= battery_low_threshold){
 			if (ColorProfile == 0) {
 				textcolor_bat_uint8 = 0b11000000; //black
 				bkgrcolor_bat_uint8 = 0b11111111; //white
@@ -1440,7 +1441,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 				textcolor_bat       = (GColor8){.argb = textcolor_bat_uint8};
 				bkgrcolor_bat       = (GColor8){.argb = bkgrcolor_bat_uint8};
 			} else if (BatteryIconColor==1){
-				if (actual_battery_percent > 20){
+				if (actual_battery_percent > battery_low_threshold){
 					textcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherTxtColor));
 					bkgrcolor_bat       = GColorFromHEX(get_hex_from_picker_int(WeatherBgColor));
 				} else {
@@ -2449,6 +2450,13 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
 			case KEY_SET_VIBE_HOUR:
 				vibe_on_hour = (int)t->value->int32;
 				break;
+
+            case KEY_SET_BTY_LOW_THRESH:
+                battery_low_threshold = (int)t->value->int32;
+                break;
+            case KEY_SET_BTY_CRIT_THRESH:
+                battery_critical_threshold = (int)t->value->int32;
+                break;
 
 			case KEY_SET_TZ_FORMAT:
 				TimeZoneFormat = (int)t->value->int32;
