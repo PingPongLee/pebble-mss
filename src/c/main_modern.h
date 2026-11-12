@@ -54,6 +54,8 @@ static TextLayer *weather_layer_7_string_2; //configurable, under moon and batte
 
 static TextLayer *text_TimeZone_layer; //24H/AM/PM and UTC-Offset
 
+static int battery_low_threshold = 20;
+static int battery_critical_threshold = 10;
 static int last_battery_percent = 0;
 static int battery_percent_on_exit = 0;
 static time_t last_battery_charged_time = 0; //absolute time of last event
@@ -384,6 +386,10 @@ void LoadData(void) {
 	key = KEY_BTY_LAST_PERIOD;
 	if (persist_exists(key)) last_battery_period_time = (time_t)(persist_read_int(key));
 
+    key = KEY_BTY_LOW_THRESH;
+    if (persist_exists(key)) battery_low_threshold = persist_read_int(key);
+    key = KEY_BTY_CRIT_THRESH;
+    if (persist_exists(key)) battery_critical_threshold = persist_read_int(key);
 
 	init_battery_handler = 1;
 
@@ -502,6 +508,9 @@ void SaveData(void) {
 	BatteryChargeState actual_charge = battery_state_service_peek();
 	persist_write_int    (KEY_BTY_PERCENT_EXIT,  actual_charge.charge_percent);
 	persist_write_int    (KEY_BTY_LAST_CHARGED,  (int)(last_battery_charged_time));
+
+    persist_write_int    (KEY_BTY_LOW_THRESH, battery_low_threshold);
+    persist_write_int    (KEY_BTY_CRIT_THRESH, battery_critical_threshold);
 
 	persist_write_int    (KEY_BTY_LAST_STATE,  last_charge_state);
 	persist_write_int    (KEY_BTY_LAST_PERIOD,  (int)(last_battery_period_time));
@@ -1258,7 +1267,7 @@ static void handle_battery(BatteryChargeState charge_state) {
 	//charge_state_int = 2: plugged and full
 
 	static BatteryChargeState old_charge_state;
-	int old_charge_state_int = 0; //not stitic, is calculated from old_charge_state
+	int old_charge_state_int = 0; //not static, is calculated from old_charge_state
 
 
 
@@ -1361,8 +1370,8 @@ static void handle_battery(BatteryChargeState charge_state) {
 		int normal = 30;
 		int low = 20;		
 	#else
-		int normal = 20;
-		int low = 10;
+		int normal = battery_low_threshold; // NOTE: Here are the Battery color thresholds
+		int low = battery_critical_threshold;
 	#endif
 
 	uint8_t fine = 0b11000100; // dark green
