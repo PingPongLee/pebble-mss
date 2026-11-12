@@ -386,9 +386,9 @@ void LoadData(void) {
 	key = KEY_BTY_LAST_PERIOD;
 	if (persist_exists(key)) last_battery_period_time = (time_t)(persist_read_int(key));
 
-    key = KEY_BTY_LOW_THRESH;
+    key = KEY_SET_BTY_LOW_THRESH;
     if (persist_exists(key)) battery_low_threshold = persist_read_int(key);
-    key = KEY_BTY_CRIT_THRESH;
+    key = KEY_SET_BTY_CRIT_THRESH;
     if (persist_exists(key)) battery_critical_threshold = persist_read_int(key);
 
 	init_battery_handler = 1;
@@ -509,8 +509,8 @@ void SaveData(void) {
 	persist_write_int    (KEY_BTY_PERCENT_EXIT,  actual_charge.charge_percent);
 	persist_write_int    (KEY_BTY_LAST_CHARGED,  (int)(last_battery_charged_time));
 
-    persist_write_int    (KEY_BTY_LOW_THRESH, battery_low_threshold);
-    persist_write_int    (KEY_BTY_CRIT_THRESH, battery_critical_threshold);
+    persist_write_int    (KEY_SET_BTY_LOW_THRESH, battery_low_threshold);
+    persist_write_int    (KEY_SET_BTY_CRIT_THRESH, battery_critical_threshold);
 
 	persist_write_int    (KEY_BTY_LAST_STATE,  last_charge_state);
 	persist_write_int    (KEY_BTY_LAST_PERIOD,  (int)(last_battery_period_time));

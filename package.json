@@ -78,7 +78,10 @@
             "KEY_WEATHER_STRING_1": 8,
             "KEY_WEATHER_STRING_2": 9,
             "KEY_WEATHER_TEMP": 3,
-            "KEY_WEATHER_UPDATE_INT": 7
+            "KEY_WEATHER_UPDATE_INT": 7,
+
+            "KEY_SET_BTY_LOW_THRESH": 300,
+            "KEY_SET_BTY_CRIT_THRESH": 301
         },
         "projectType": "native",
         "resources": {

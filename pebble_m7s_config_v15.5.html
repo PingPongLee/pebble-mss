@@ -63,6 +63,16 @@
       <option value="2">Time since last update of OWM data of the server</option>
     </select>
     </p>
+
+    <p> Battery Low Percentage Threshold (0-100)  <font color=”#FF0000”>[8]</font>:
+      <br>
+      <input id="bat_low_threshold" type="number" min="0" max="100" value="20"/>
+    </p>
+
+    <p> Battery Critical Percentage Threshold (0-100)  <font color=”#FF0000”>[8]</font>:
+      <br>
+      <input id="bat_crit_threshold" type="number" min="0" max="100" value="10"/>
+    </p>
     
     <p> Moon Phase: <font color=”#FF0000”>[7]</font>:
     <br>
@@ -356,6 +366,8 @@
       var autodetlocSelect = document.getElementById("autodetect_loc_select");
       var owmlangEdit = document.getElementById("owm_lang_edit");
       var updateTimeSelect = document.getElementById("show_update_time_select");
+      var batLowThreshold = document.getElementById("bat_low_threshold");
+      var batCritThreshold = document.getElementById("bat_crit_threshold");
 	  var invertSelect = document.getElementById("invert_select");
 	  var coloredTempSelect = document.getElementById("color_temp_select");
 	  var lightSelect = document.getElementById("light_select");
@@ -410,6 +422,8 @@
           "autodetect_loc": autodetlocSelect.selectedIndex,
           "lang_id": owmlangEdit.value,
           "show_update_time": updateTimeSelect.selectedIndex,
+          "bat_low_threshold": batLowThreshold.value,
+          "bat_crit_threshold": batCritThreshold.value,
           "moon_phase": moonSelect.selectedIndex,
           "weatherLine1": weatherLine1Select.selectedIndex,
           "weatherLine2": weatherLine2Select.selectedIndex,
@@ -566,7 +580,15 @@
   		      moonSelect.selectedIndex = init_options.moon_phase;
 			  console.log('moonSelect set to '+init_options.moon_phase);
 		    }
-		    
+
+            if (init_options.bat_low_threshold !== "undefined"){
+              batLowThreshold.value = init_options.bat_low_threshold;
+              console.log('batLowThreshold set to '+init_options.bat_low_threshold);
+            }
+            if (init_options.bat_crit_threshold !== "undefined"){
+              batCritThreshold.value = init_options.bat_crit_threshold;
+              console.log('batCritThreshold set to '+init_options.bat_crit_threshold);
+            }
 		    
 		    if (init_options.weatherLine1 !== "undefined"){
   		      weatherLine1Select.selectedIndex = init_options.weatherLine1;
